@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Live Feed{% endblock %}
+{% block page_title %}AutoMR · Live Feed{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <h4 class="page-title">Live Feed</h4>
+            <p class="text-muted ">
+                Open the IP Webcam app on your phone, tap <strong>Start server</strong>, and make sure
+                your phone and this server are on the <strong>same WiFi network</strong>. Set the base URL
+                once on the <a href="{% url 'dashboard:settings' %}">Settings</a> page, or override it below
+                for just this session.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div id="live-error-alert" class="alert alert-danger d-none"></div>
+
+<div class="row mb-3">
+        <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Live video</h5>
+                <div id="live-video-wrap" class="position-relative bg-dark rounded d-flex align-items-center justify-content-center" style="width:100%; aspect-ratio: 16 / 9;">
+                    <img id="live-video-frame" class="rounded d-none" style="width:100%; height:100%; object-fit:contain;">
+                    <span id="live-video-placeholder" class="text-muted"></span>
+                    <button type="button" id="btn-play-video"
+                            class="btn btn-primary rounded-circle position-absolute d-flex align-items-center justify-content-center"
+                            style="width:64px;height:64px;top:50%;left:50%;transform:translate(-50%,-50%);">
+                        <i class="mdi mdi-play" style="font-size:28px;"></i>
+                    </button>
+                </div>
+                <div class="mt-3">
+                    <div class="d-flex gap-2">
+                        <button type="button" id="btn-start" class="btn btn-primary flex-fill"> Start live test</button>
+                        <button type="button" id="btn-stop" class="btn btn-secondary flex-fill" disabled> Stop</button>
+                    </div>
+                    <button type="button" id="btn-reset" class="btn btn-outline-danger w-100 mt-2"> Reset history</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="col-lg-6">
+    <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+            <h4 class="header-title mb-3">Configuration</h4>
+            <form id="live-config-form" class="d-flex flex-column flex-grow-1">
+                <div class="row g-2">
+                    <div class="col-12">
+                        <label class="form-label mb-1">IP Webcam base URL (this session)</label>
+                        <input type="text" id="id_ip_webcam_url" class="form-control form-control-sm"
+                               value="{{ camera_settings.ip_webcam_url }}" placeholder="http://192.168.1.23:8080">
+                    </div>
+
+                    <div class="col-6">
+                        <label class="form-label mb-1">Model</label>
+                        {{ form.model }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mb-1">Task</label>
+                        {{ form.task }}
+                    </div>
+
+                    <div class="col-3">
+                        <label class="form-label mb-1">Range (%)</label>
+                        {{ form.range_threshold }}
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label mb-1">Samples</label>
+                        {{ form.samples_per_mr }}
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label mb-1">Epsilon</label>
+                        {{ form.live_epsilon }}
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label mb-1">Interval</label>
+                        {{ form.update_interval }}
+                    </div>
+
+                    <div class="col-6">
+                        <label class="form-label mb-1">Resize width</label>
+                        {{ form.resize_width }}
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label mb-1">Resize height</label>
+                        {{ form.resize_height }}
+                    </div>
+                </div>
+
+                <div class="form-text mt-1 mb-2">
+                    Resize must match training size (e.g. 64 × 64). Leave both blank for raw camera resolution.
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label mb-1">Metamorphic relations to run</label>
+                    <div class="row g-1 border rounded p-2" style="max-height:130px; overflow-y:auto;">
+                        {% for checkbox in form.selected_mrs %}
+                        <div class="col-4 form-check">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label small" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card widget-flat">
+                    <div class="card-body">
+                        <h5 class="text-muted fw-normal mt-0">Frames tested</h5>
+                        <h3 class="mt-3 mb-0" id="metric-frames">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card widget-flat">
+                    <div class="card-body">
+                        <h5 class="text-muted fw-normal mt-0">Avg failure rate</h5>
+                        <h3 class="mt-3 mb-0" id="metric-avg">0.0%</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card widget-flat">
+                    <div class="card-body">
+                        <h5 class="text-muted fw-normal mt-0">Latest failure rate</h5>
+                        <h3 class="mt-3 mb-0" id="metric-latest">0.0%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title">Overall failure rate</h5>
+                <div id="overall-chart"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title">Failure rate per relation, per frame</h5>
+                <div id="relation-fail-chart"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title">Average severity per relation, per frame</h5>
+                <div id="relation-sev-chart"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Captured frames</h5>
+                <div id="filmstrip" class="d-flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Recent frames (raw)</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-centered mb-0">
+                        <thead><tr><th>Frame</th><th>Failure rate</th><th>Checks</th><th>Failed</th></tr></thead>
+                        <tbody id="history-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/ubold/assets/libs/apexcharts/apexcharts.min.js' %}"></script>
+<script>
+const videoImg = document.getElementById("live-video-frame");
+    const videoPlaceholder = document.getElementById("live-video-placeholder");
+    const btnPlayVideo = document.getElementById("btn-play-video");
+    let videoPlaying = false;
+
+    function streamUrlFromBase(base) {
+        return base.replace(/\/+$/, "") + "/video";
+    }
+
+    function startVideoStream() {
+        const base = document.getElementById("id_ip_webcam_url").value.trim();
+        if (!base) {
+            showError("Enter an IP Webcam base URL first.");
+            return;
+        }
+        videoImg.onerror = () => {
+            videoPlaying = false;
+            videoImg.classList.add("d-none");
+            videoPlaceholder.textContent = "";
+            videoPlaceholder.classList.remove("d-none");
+            btnPlayVideo.classList.remove("d-none");
+        };
+        videoImg.src = streamUrlFromBase(base) + "?t=" + Date.now(); // cache-bust
+        videoImg.classList.remove("d-none");
+        videoPlaceholder.classList.add("d-none");
+        btnPlayVideo.classList.add("d-none");
+        videoPlaying = true;
+    }
+
+    function stopVideoStream() {
+        videoPlaying = false;
+        videoImg.src = "";
+        videoImg.classList.add("d-none");
+        videoPlaceholder.textContent = "Enter the base URL and press play";
+        videoPlaceholder.classList.remove("d-none");
+        btnPlayVideo.classList.remove("d-none");
+    }
+
+    btnPlayVideo.addEventListener("click", () => {
+        if (videoPlaying) {
+            stopVideoStream();
+        } else {
+            startVideoStream();
+        }
+    });
+    videoImg.addEventListener("dblclick", () => {
+        if (videoPlaying) {
+            stopVideoStream();
+        }
+    });
+(function () {
+    const SNAPSHOT_URL = "{% url 'robustness:live_feed_snapshot' %}";
+    const MAX_KEPT = 500;
+    const MAX_SHOWN_THUMBS = 15;
+
+    let running = false;
+    let timerId = null;
+    let frameCount = 0;
+    let consecutiveErrors = 0;
+
+    let history = [];              // [{frame, failure_rate, total_checks, failed}]
+    let relationFailHistory = {};  // {mr: [{frame, value}, ...]}
+    let relationSevHistory = {};
+    let thumbnails = [];           // [{frame, src, failure_rate}]
+
+    const errorAlert = document.getElementById("live-error-alert");
+    const btnStart = document.getElementById("btn-start");
+    const btnStop = document.getElementById("btn-stop");
+    const btnReset = document.getElementById("btn-reset");
+
+    let overallChart = new ApexCharts(document.querySelector("#overall-chart"), {
+        chart: { type: "line", height: 220, toolbar: { show: false }, animations: { enabled: false } },
+        series: [{ name: "failure_rate", data: [] }],
+        xaxis: { title: { text: "frame" } },
+        colors: ["#727cf5"],
+        stroke: { width: 2 },
+    });
+    overallChart.render();
+
+    let relationFailChart = new ApexCharts(document.querySelector("#relation-fail-chart"), {
+        chart: { type: "line", height: 260, toolbar: { show: false }, animations: { enabled: false } },
+        series: [],
+        xaxis: { title: { text: "frame" } },
+        stroke: { width: 2 },
+    });
+    relationFailChart.render();
+
+    let relationSevChart = new ApexCharts(document.querySelector("#relation-sev-chart"), {
+        chart: { type: "line", height: 260, toolbar: { show: false }, animations: { enabled: false } },
+        series: [],
+        xaxis: { title: { text: "frame" } },
+        stroke: { width: 2 },
+    });
+    relationSevChart.render();
+
+    function showError(msg) {
+        errorAlert.textContent = msg;
+        errorAlert.classList.remove("d-none");
+    }
+    function clearError() {
+        errorAlert.classList.add("d-none");
+        errorAlert.textContent = "";
+    }
+
+    function getSelectedMrs() {
+        return Array.from(document.querySelectorAll("input[name='selected_mrs']:checked")).map(el => el.value);
+    }
+
+    function buildParams() {
+        const params = new URLSearchParams();
+        params.set("ip_webcam_url", document.getElementById("id_ip_webcam_url").value.trim());
+        params.set("model_id", document.getElementById("id_model").value);
+        params.set("task", document.getElementById("id_task").value);
+        params.set("range_threshold", document.getElementById("id_range_threshold").value);
+        params.set("samples_per_mr", document.getElementById("id_samples_per_mr").value);
+        params.set("live_epsilon", document.getElementById("id_live_epsilon").value);
+        params.set("resize_width", document.getElementById("id_resize_width").value);
+        params.set("resize_height", document.getElementById("id_resize_height").value);
+        params.set("selected_mrs", getSelectedMrs().join(","));
+        params.set("frame_index", frameCount);
+        return params;
+    }
+
+    function trim(arr) {
+        if (arr.length > MAX_KEPT) arr.splice(0, arr.length - MAX_KEPT);
+        return arr;
+    }
+
+    function updateMetrics() {
+        document.getElementById("metric-frames").textContent = history.length;
+        if (!history.length) return;
+        const avg = history.reduce((s, h) => s + h.failure_rate, 0) / history.length;
+        document.getElementById("metric-avg").textContent = (avg * 100).toFixed(1) + "%";
+        document.getElementById("metric-latest").textContent = (history[history.length - 1].failure_rate * 100).toFixed(1) + "%";
+    }
+
+    function updateOverallChart() {
+        const sorted = [...history].sort((a, b) => a.frame - b.frame);
+        overallChart.updateSeries([{ name: "failure_rate", data: sorted.map(h => [h.frame, h.failure_rate]) }]);
+    }
+
+    function updateRelationCharts() {
+        const failSeries = Object.keys(relationFailHistory).map(mr => {
+            const sorted = [...relationFailHistory[mr]].sort((a, b) => a.frame - b.frame);
+            return { name: mr, data: sorted.map(p => [p.frame, p.value]) };
+        });
+        relationFailChart.updateSeries(failSeries);
+
+        const sevKeys = Object.keys(relationSevHistory);
+        if (sevKeys.length) {
+            const sevSeries = sevKeys.map(mr => {
+                const sorted = [...relationSevHistory[mr]].sort((a, b) => a.frame - b.frame);
+                return { name: mr, data: sorted.map(p => [p.frame, p.value]) };
+            });
+            relationSevChart.updateSeries(sevSeries);
+        }
+    }
+
+    function updateFilmstrip() {
+        const shown = thumbnails.slice(-MAX_SHOWN_THUMBS);
+        const el = document.getElementById("filmstrip");
+        el.innerHTML = "";
+        shown.forEach(t => {
+            const wrap = document.createElement("div");
+            wrap.className = "text-center";
+            wrap.style.width = "100px";
+            wrap.innerHTML = `
+                <img src="${t.src}" class="img-fluid rounded mb-1" style="width:100px;height:75px;object-fit:cover;">
+                <div class="small text-muted">#${t.frame} · ${(t.failure_rate * 100).toFixed(0)}%</div>
+            `;
+            el.appendChild(wrap);
+        });
+    }
+
+    function updateHistoryTable() {
+        const tbody = document.getElementById("history-table-body");
+        const shown = history.slice(-20).reverse();
+        tbody.innerHTML = shown.map(h => `
+            <tr>
+                <td>${h.frame}</td>
+                <td>${(h.failure_rate * 100).toFixed(1)}%</td>
+                <td>${h.total_checks}</td>
+                <td>${h.failed}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function fetchFrame() {
+        try {
+            const params = buildParams();
+            const resp = await fetch(`${SNAPSHOT_URL}?${params.toString()}`);
+            const data = await resp.json();
+            if (!resp.ok || data.error) {
+                consecutiveErrors += 1;
+                showError(data.error || "Live test failed.");
+                if (consecutiveErrors >= 3) stopLive();
+                return;
+            }
+            consecutiveErrors = 0;
+            clearError();
+
+            history.push({ frame: data.frame, failure_rate: data.failure_rate, total_checks: data.total_checks, failed: data.failed });
+            trim(history);
+
+            Object.entries(data.per_mr).forEach(([mr, vals]) => {
+                if (!relationFailHistory[mr]) relationFailHistory[mr] = [];
+                relationFailHistory[mr].push({ frame: data.frame, value: vals.failure_rate });
+                trim(relationFailHistory[mr]);
+                if (vals.severity !== null && vals.severity !== undefined) {
+                    if (!relationSevHistory[mr]) relationSevHistory[mr] = [];
+                    relationSevHistory[mr].push({ frame: data.frame, value: vals.severity });
+                    trim(relationSevHistory[mr]);
+                }
+            });
+
+            thumbnails.push({ frame: data.frame, src: data.thumbnail, failure_rate: data.failure_rate });
+            trim(thumbnails);
+
+            frameCount += 1;
+            updateMetrics();
+            updateOverallChart();
+            updateRelationCharts();
+            updateFilmstrip();
+            updateHistoryTable();
+        } catch (e) {
+            consecutiveErrors += 1;
+            showError("Live test failed: " + e);
+            if (consecutiveErrors >= 3) stopLive();
+        }
+    }
+
+    function startLive() {
+        if (!getSelectedMrs().length) {
+            showError("Select at least one metamorphic relation.");
+            return;
+        }
+        if (!document.getElementById("id_ip_webcam_url").value.trim()) {
+            showError("Enter an IP Webcam base URL.");
+            return;
+        }
+        if (frameCount === 0 && history.length > 0) {
+            resetHistory();
+        }
+        running = true;
+        consecutiveErrors = 0;
+        clearError();
+        btnStart.disabled = true;
+        btnStop.disabled = false; 
+        const intervalMs = parseFloat(document.getElementById("id_update_interval").value) * 1000;
+        fetchFrame();
+        timerId = setInterval(fetchFrame, intervalMs);
+    }
+
+    function stopLive() {
+        running = false;
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+        btnStart.disabled = false;
+        btnStop.disabled = true;
+    }
+
+    function resetHistory() {
+        history = [];
+        relationFailHistory = {};
+        relationSevHistory = {};
+        thumbnails = [];
+        frameCount = 0;
+        updateMetrics();
+        updateOverallChart();
+        relationFailChart.updateSeries([]);
+        relationSevChart.updateSeries([]);
+        document.getElementById("filmstrip").innerHTML = "";
+        document.getElementById("history-table-body").innerHTML = "";
+        clearError();
+    }
+
+    btnStart.addEventListener("click", startLive);
+    btnStop.addEventListener("click", stopLive);
+    btnReset.addEventListener("click", resetHistory);
+})();
+
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ dataset.name }}{% endblock %}
+{% block page_title %}Dataset · {{ dataset.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+            <h4 class="page-title">{{ dataset.name }}</h4>
+            <a href="{% url 'robustness:dataset_list' %}" class="btn btn-sm btn-light"><i class="mdi mdi-arrow-left"></i> Back</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3"><strong>Source:</strong> {{ dataset.get_source_type_display }}</div>
+                    <div class="col-md-3"><strong>Resize:</strong> {% if dataset.resize_to %}{{ dataset.resize_width }}×{{ dataset.resize_height }}{% else %}none{% endif %}</div>
+                    <div class="col-md-3"><strong>Normalize:</strong> {{ dataset.normalize|yesno:"yes,no" }}</div>
+                    <div class="col-md-3"><strong>Uploaded:</strong> {{ dataset.uploaded_at|date:"M d, Y H:i" }}</div>
+                </div>
+
+                {% if dataset.source_type == 'folder' %}
+                <p class="text-muted"><code>{{ dataset.folder_path }}</code>{% if dataset.max_images %} — capped at {{ dataset.max_images }} images{% endif %}</p>
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                {% endif %}
+
+                <h5 class="mt-3 mb-2">Preview</h5>
+                {% if preview_images %}
+                <div class="row">
+                    {% for p in preview_images %}
+                    <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <div class="text-truncate small text-muted mb-1">{{ p }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="text-muted small">Server-side paths shown above ({{ preview_images|length }} found) — images are read from disk fresh at each test run.</p>
+                {% elif dataset.source_type == 'upload' %}
+                <div class="row">
+                    {% for di in dataset.images.all %}
+                    <div class="col-6 col-md-3 col-lg-2 mb-3">
+                        <img src="{{ di.image.url }}" class="img-fluid rounded" alt="">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No images found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

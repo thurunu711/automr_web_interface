@@ -1,0 +1,30 @@
+{% if files %}
+<div class="table-responsive">
+    <table class="table table-sm table-centered mb-0">
+        <thead><tr><th style="width:110px;"></th><th>File</th><th>Size</th></tr></thead>
+        <tbody>
+            {% for f in files %}
+            <tr>
+                <td class="text-start text-nowrap">
+                    {% if f.kind != "other" %}
+                    <button type="button" class="btn btn-sm btn-soft-secondary file-preview-btn"
+                            data-url="{% url 'robustness:testrun_download_file' run.pk f.rel %}"
+                            data-name="{{ f.rel }}"
+                            data-kind="{{ f.kind }}">
+                        <i class="mdi {% if f.kind == 'csv' %}mdi-chart-bar{% elif f.kind == 'image' %}mdi-image-outline{% else %}mdi-text-box-outline{% endif %}"></i>
+                    </button>
+                    {% endif %}
+                    <a href="{% url 'robustness:testrun_download_file' run.pk f.rel %}" class="btn btn-sm btn-soft-primary">
+                        <i class="mdi mdi-download"></i>
+                    </a>
+                </td>
+                <td class="text-break"><code>{{ f.rel }}</code></td>
+                <td class="text-nowrap">{{ f.size|filesizeformat }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted mb-0">No files in this category.</p>
+{% endif %}

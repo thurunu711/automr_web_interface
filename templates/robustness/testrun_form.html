@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Run Test{% endblock %}
+{% block page_title %}AutoMR · Run Test{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <h4 class="page-title">3 · Run AutoMR — exactly the run_test.py pipeline</h4>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <h5 class="mb-2">Model &amp; dataset</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Model</label>
+                            {{ form.model }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Dataset</label>
+                            {{ form.dataset }}
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-2">AutoMR settings</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Task</label>
+                            {{ form.task }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">range_threshold (%)</label>
+                            {{ form.range_threshold }}
+                        </div>
+                    </div>
+
+                    <h6 class="mt-2 mb-2 text-muted">run_full_test(...) params</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">max_samples</label>
+                            {{ form.max_samples }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">samples_per_mr</label>
+                            {{ form.samples_per_mr }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 form-check">
+                            {{ form.show_progress }}
+                            <label class="form-check-label">show_progress</label>
+                        </div>
+                        <div class="col-md-6 mb-3 form-check">
+                            {{ form.verbose }}
+                            <label class="form-check-label">verbose</label>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-2 mb-2 text-muted">Epsilon sweep</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">epsilon_min</label>
+                            {{ form.epsilon_min }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">epsilon_max</label>
+                            {{ form.epsilon_max }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">epsilon_count</label>
+                            {{ form.epsilon_count }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">output_dir</label>
+                        {{ form.output_dir }}
+                        <div class="form-text">Left blank auto-generates <code>media/automr_runs/run_&lt;id&gt;/</code>.</div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-2">Metamorphic relations to run</h5>
+                    <div class="row">
+                        {% for checkbox in form.selected_mrs %}
+                        <div class="col-6 col-md-4 form-check mb-2">
+                            {{ checkbox.tag }}
+                            <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        <i class="mdi mdi-rocket-launch-outline"></i> Run Full Metamorphic Test
+                    </button>
+                    <p class="text-muted small mt-2 mb-0">This runs synchronously — the page will wait until <code>automr.run_full_test(...)</code> finishes.</p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title">Tips</h5>
+                <ul class="text-muted ps-3 mb-0">
+                    <li class="mb-2">No model or dataset yet? Go to <a href="{% url 'robustness:model_list' %}">Models</a> / <a href="{% url 'robustness:dataset_list' %}">Datasets</a> first.</li>
+                    <li class="mb-2">Larger <code>max_samples</code> / <code>samples_per_mr</code> / <code>epsilon_count</code> means a longer synchronous run.</li>
+                    <li>Past runs are listed under <a href="{% url 'robustness:testrun_list' %}">Test Runs</a>.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

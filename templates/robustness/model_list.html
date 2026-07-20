@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Models{% endblock %}
+{% block page_title %}AutoMR · Models{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+            <h4 class="page-title">1 · Models</h4>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-3">Load a model</h4>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Framework</label>
+                        {{ form.framework }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Model file</label>
+                        {{ form.model_file }}
+                        <div class="form-text">.h5 / .keras / .pt / .pth / .pkl / .joblib / .onnx</div>
+                    </div>
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary w-100">Load model</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-3">Loaded models</h4>
+                {% if models %}
+                <div class="table-responsive">
+                    <table class="table table-centered mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Framework</th>
+                                <th>File</th>
+                                <th>Uploaded</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in models %}
+                            <tr>
+                                <td>{{ m.name }}</td>
+                                <td><span class="badge bg-soft-primary text-primary">{{ m.get_framework_display }}</span></td>
+                                <td><code>{{ m.filename }}</code></td>
+                                <td>{{ m.uploaded_at|date:"M d, Y H:i" }}</td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'robustness:model_delete' m.pk %}" class="d-inline" onsubmit="return confirm('Delete this model?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-soft-danger"><i class="mdi mdi-trash-can-outline"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No models loaded yet — use the form to upload one.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

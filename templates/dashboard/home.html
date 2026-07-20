@@ -1,0 +1,2439 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <h4 class="page-title">Dashboard</h4>
+        </div>
+    </div>
+</div>
+
+
+<!-- ================= VIDEO + WELCOME ================= -->
+
+<div class="row">
+
+    <!-- Video -->
+    <div class="col-lg-6">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h1 class="display-6 mb-0">
+                    Watch Video
+                </h1>
+
+                <p class="sub-header">
+                    <code></code>
+                </p>
+
+                <div class="ratio ratio-16x9">
+
+                    <iframe
+                        src="https://www.youtube.com/embed/Zl3YSPilT-w?rel=0"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen
+                        referrerpolicy="strict-origin-when-cross-origin">
+                    </iframe>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- end col -->
+
+
+    <!-- Welcome -->
+    <div class="col-lg-6">
+
+        <div class="card">
+
+            <div class="card-body">
+
+
+                <div class="d-flex align-items-center mb-3">
+
+                    <h1 class="display-6 mb-0">
+                        Welcome to
+                    </h1>
+
+                    <a href="{% url 'dashboard:home' %}">
+                        <img src="{% static 'automrlogo.png' %}"
+                             alt="AutoMR Logo"
+                             style="height:70px; width:auto;"
+                             class="ms-3">
+                    </a>
+
+                </div>
+
+
+
+                <h3 class="text-primary mb-4">
+                    Test Autonomous Driving Models with Confidence
+                </h3>
+
+
+
+                <p class="lead" style="text-align: justify;">
+
+                    AutoMR is an intelligent metamorphic testing platform designed
+                    to evaluate regression-based autonomous driving models; even
+                    when the correct output is unknown.
+
+                </p>
+
+
+
+                <p class="lead" style="text-align: justify;">
+
+                    Instead of relying on traditional test cases with predefined
+                    expected results, AutoMR automatically generates follow-up
+                    tests using carefully designed
+                    <strong>Metamorphic Relations (MRs)</strong>
+                    to uncover hidden defects, improve model reliability, and
+                    support safer Autonomous Driving systems.
+
+                </p>
+
+
+
+                <hr>
+
+
+                <h3 class="mb-3">
+                    Ready to Start?
+                </h3>
+
+
+
+                <p class="lead" style="text-align: justify;">
+
+                    Select a testing workflow from the navigation menu to upload
+                    your model, execute metamorphic tests, and explore detailed
+                    validation results.
+
+                </p>
+
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- end col -->
+
+</div>
+<!-- end row -->
+
+
+
+
+
+<!-- ================= AUTO MR LIBRARY ================= -->
+
+
+<div class="row">
+
+    <div class="col-lg-12">
+
+        <div class="card">
+
+            <div class="card-body">
+
+
+                <h1 class="display-6 mb-0">
+                    Driving Conditions
+                </h1>
+
+
+
+                <p class="lead mt-3" style="text-align: justify;">
+
+                    When driving conditions become more complex, human drivers
+                    face greater challenges. Similarly, autonomous driving
+                    systems must be evaluated under diverse and challenging
+                    scenarios to ensure robust and trustworthy performance.
+
+                </p>
+
+
+
+                <hr>
+
+
+
+                <!-- Wizard -->
+
+                <div id="automrwizard">
+
+
+                    <ul class="nav nav-pills bg-light nav-justified form-wizard-header mb-4">
+
+
+                        <li class="nav-item">
+
+                            <a href="#mr_tab1"
+                               data-bs-toggle="tab"
+                               class="nav-link active rounded-0 pt-2 pb-2">
+
+                                <i class="mdi mdi-camera-enhance me-1"></i>
+                                <span class="d-none d-sm-inline">
+                                    Image Transformations
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+
+                        <li class="nav-item">
+
+                            <a href="#mr_tab2"
+                               data-bs-toggle="tab"
+                               class="nav-link rounded-0 pt-2 pb-2">
+
+                                <i class="mdi mdi-weather-cloudy me-1"></i>
+
+                                <span class="d-none d-sm-inline">
+                                    Weather & Environment
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+
+
+                        <li class="nav-item">
+
+                            <a href="#mr_tab3"
+                               data-bs-toggle="tab"
+                               class="nav-link rounded-0 pt-2 pb-2">
+
+                                <i class="mdi mdi-video me-1"></i>
+
+                                <span class="d-none d-sm-inline">
+                                    Temporal
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                    </ul>
+
+
+
+                    <div class="tab-content b-0 mb-0 pt-0">
+
+
+                        <!-- IMAGE TAB START -->
+
+                        <div class="tab-pane active" id="mr_tab1">
+
+<div class="row g-3">
+
+
+    <!-- ================= BRIGHTNESS ================= -->
+
+    <div class="col-xl-3 col-lg-6">
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="brightness-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Brightness">
+
+
+            <div class="card-body">
+
+                <h3 class="font-20">
+                    Brightness
+                </h3>
+
+
+                <p class="text-muted fs-5">
+                    Prediction stability under lighting changes.
+                </p>
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+                <input type="range"
+                       class="form-range"
+                       min="-100"
+                       max="100"
+                       value="0"
+                       oninput="applyBrightness(this.value)">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+    <!-- ================= CONTRAST ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="contrast-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Contrast">
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Contrast
+                </h3>
+
+
+                <p class="text-muted fs-5">
+                    Robustness against contrast variations.
+                </p>
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+                <input type="range"
+                       class="form-range"
+                       min="0"
+                       max="200"
+                       value="100"
+                       oninput="applyContrast(this.value)">
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- ================= BLUR ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="blur-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Blur">
+
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Blur
+                </h3>
+
+
+                <p class="text-muted fs-5">
+                    Handles reduced image sharpness.
+                </p>
+
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+
+                <input type="range"
+                       class="form-range"
+                       min="0"
+                       max="10"
+                       value="0"
+                       oninput="applyBlur(this.value)">
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- ================= NOISE ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="noise-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Noise">
+
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Noise
+                </h3>
+
+
+
+                <p class="text-muted fs-5">
+                    Tests sensor noise tolerance.
+                </p>
+
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+
+                <input type="range"
+                       class="form-range"
+                       min="0"
+                       max="100"
+                       value="0"
+                       oninput="applyNoise(this.value)">
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+</div>
+<!-- end row -->
+
+
+
+
+
+<!-- SECOND ROW -->
+
+<div class="row g-3 mt-1">
+
+
+
+
+
+    <!-- ================= ROTATION ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="rotation-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Rotation">
+
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Rotation
+                </h3>
+
+
+
+                <p class="text-muted fs-5">
+                    Small camera angle changes.
+                </p>
+
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+
+                <input type="range"
+                       class="form-range"
+                       min="-30"
+                       max="30"
+                       value="0"
+                       oninput="applyRotation(this.value)">
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- ================= TRANSLATION ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="translation-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Translation">
+
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Translation
+                </h3>
+
+
+
+                <p class="text-muted fs-5">
+                    Image position shifts.
+                </p>
+
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+
+                <input type="range"
+                       class="form-range"
+                       min="-50"
+                       max="50"
+                       value="0"
+                       oninput="applyTranslation(this.value)">
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- ================= COMPOSITE ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="composite-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Composite">
+
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Composite
+                </h3>
+
+
+
+                <p class="text-muted fs-5">
+                    Multiple transformations together.
+                </p>
+
+
+
+                <label class="form-label">
+                    Intensity
+                </label>
+
+
+
+                <input type="range"
+                       class="form-range"
+                       min="0"
+                       max="100"
+                       value="0"
+                       oninput="applyComposite(this.value)">
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <!-- ================= FLIP ================= -->
+
+
+    <div class="col-xl-3 col-lg-6">
+
+
+        <div class="card h-100 shadow-sm">
+
+
+            <img id="flip-img"
+                 src="{% static 'transform.png' %}"
+                 class="card-img-top transform-image"
+                 style="height:300px; object-fit:cover;"
+                 alt="Flip">
+
+
+
+            <div class="card-body">
+
+
+                <h3 class="font-20">
+                    Flip
+                </h3>
+
+
+
+                <p class="text-muted fs-5">
+                    Validates steering inversion behavior.
+                </p>
+
+
+
+                <label class="form-label">
+                    Enable Flip
+                </label>
+
+
+
+                <input type="range"
+                       class="form-range"
+                       min="0"
+                       max="1"
+                       value="0"
+                       step="1"
+                       oninput="applyFlip(this.value)">
+
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+<!-- end second row -->
+                 
+                        </div>
+                <!-- ================= WEATHER ================= -->
+
+
+<!-- ================= WEATHER & ENVIRONMENT ================= -->
+<div class="tab-pane" id="mr_tab2">
+    <h4 class="mb-3">Weather & Environmental Testing</h4>
+    <p class="text-muted fs-5">
+        Evaluates model reliability under challenging real-world environmental conditions.
+        Move the sliders to see live effects.
+    </p>
+    
+    <div class="row g-3">
+        <!-- Rain -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="position-relative">
+                    <canvas id="rain-canvas" width="300" height="300" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></canvas>
+                    <img id="rain-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Rain">
+                </div>
+                <div class="card-body">
+                    <h3 class="font-20">Rain</h3>
+                    <p class="text-muted fs-5">Tests rainy road conditions.</p>
+                    <label class="form-label">Intensity <span id="rain-val" class="float-end">5%</span></label>
+                    <input type="range" id="rain-slider" class="form-range" min="0" max="100" value="5" oninput="applyRain(this.value); document.getElementById('rain-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+
+        <!-- Snow -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="position-relative">
+                    <canvas id="snow-canvas" width="300" height="300" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></canvas>
+                    <img id="snow-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Snow">
+                </div>
+                <div class="card-body">
+                    <h3 class="font-20">Snow</h3>
+                    <p class="text-muted fs-5">Evaluates snowy environments.</p>
+                    <label class="form-label">Intensity <span id="snow-val" class="float-end">5%</span></label>
+                    <input type="range" id="snow-slider" class="form-range" min="0" max="80" value="5" oninput="applySnow(this.value); document.getElementById('snow-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+
+        <!-- Fog -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <img id="fog-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Fog">
+                <div class="card-body">
+                    <h3 class="font-20">Fog</h3>
+                    <p class="text-muted fs-5">Tests reduced visibility.</p>
+                    <label class="form-label">Density <span id="fog-val" class="float-end">30%</span></label>
+                    <input type="range" id="fog-slider" class="form-range" min="0" max="100" value="30" oninput="applyFog(this.value); document.getElementById('fog-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sandstorm / Dust -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="position-relative">
+                    <canvas id="dust-canvas" width="300" height="300" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></canvas>
+                    <img id="dust-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Sandstorm">
+                </div>
+                <div class="card-body">
+                    <h3 class="font-20">Sandstorm / Dust</h3>
+                    <p class="text-muted fs-5">Airborne particle effects.</p>
+                    <label class="form-label">Intensity <span id="dust-val" class="float-end">5%</span></label>
+                    <input type="range" id="dust-slider" class="form-range" min="0" max="100" value="5" oninput="applyDust(this.value); document.getElementById('dust-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-3">
+        <!-- Haze -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <img id="haze-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Haze">
+                <div class="card-body">
+                    <h3 class="font-20">Haze</h3>
+                    <p class="text-muted fs-5">Atmospheric visibility degradation.</p>
+                    <label class="form-label">Intensity <span id="haze-val" class="float-end">30%</span></label>
+                    <input type="range" id="haze-slider" class="form-range" min="0" max="100" value="30" oninput="applyHaze(this.value); document.getElementById('haze-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+
+        <!-- Smoke -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="position-relative">
+                    <canvas id="smoke-canvas" width="300" height="300" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></canvas>
+                    <img id="smoke-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Smoke">
+                </div>
+                <div class="card-body">
+                    <h3 class="font-20">Smoke</h3>
+                    <p class="text-muted fs-5">Smoke affected environments.</p>
+                    <label class="form-label">Density <span id="smoke-val" class="float-end">5%</span></label>
+                    <input type="range" id="smoke-slider" class="form-range" min="0" max="100" value="5" oninput="applySmoke(this.value); document.getElementById('smoke-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+
+        <!-- Dark Visibility -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <img id="dark-img" src="{% static 'transform.png' %}" class="card-img-top transform-image" style="height:300px; object-fit:cover;" alt="Dark">
+                <div class="card-body">
+                    <h3 class="font-20">Dark Visibility</h3>
+                    <p class="text-muted fs-5">Low-light driving conditions.</p>
+                    <label class="form-label">Darkness <span id="dark-val" class="float-end">30%</span></label>
+                    <input type="range" id="dark-slider" class="form-range" min="0" max="95" value="30" oninput="applyDark(this.value); document.getElementById('dark-val').textContent = this.value + '%';">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+                <!-- ================= TEMPORAL ================= -->
+
+
+
+    <!-- ================= TEMPORAL & PREDICTION TESTING ================= -->
+<div class="tab-pane" id="mr_tab3">
+    <h4 class="mb-3">Temporal & Prediction Testing</h4>
+    <p class="text-muted fs-5">
+        Ensures autonomous driving models produce logically consistent predictions 
+        over time and under expected relationships.
+    </p>
+    
+    <div class="row g-3">
+        <!-- Temporal Smoothness -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="font-20">Temporal Smoothness</h3>
+                    <p class="text-muted fs-5">Consecutive frames should produce smoothly changing predictions.</p>
+                    
+                    <div class="text-center mb-3">
+                        <img id="smooth-base" src="{% static 'transform.png' %}" class="img-fluid rounded" style="max-height:180px;" alt="Frame">
+                        <div class="mt-2">
+                            <strong>Predicted Steering:</strong> 
+                            <span id="smooth-value" class="text-primary fw-bold">+2.4°</span>
+                        </div>
+                    </div>
+                    
+                    <label class="form-label">Time Progression <span id="smooth-val" class="float-end">0%</span></label>
+                    <input type="range" id="smooth-slider" class="form-range" min="0" max="100" value="0" 
+                           oninput="applySmoothness(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Temporal Consistency -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="font-20">Temporal Consistency</h3>
+                    <p class="text-muted fs-5">Nearby frames should maintain stable outputs.</p>
+                    
+                    <div class="d-flex justify-content-center gap-3 mb-3">
+                        <div class="text-center">
+                            <small>Frame t</small><br>
+                            <strong id="consist-t" class="text-success">+1.8°</strong>
+                        </div>
+                        <div class="text-center">
+                            <small>Frame t+1</small><br>
+                            <strong id="consist-t1" class="text-success">+1.9°</strong>
+                        </div>
+                    </div>
+                    
+                    <label class="form-label">Noise Level <span id="consist-val" class="float-end">0%</span></label>
+                    <input type="range" id="consist-slider" class="form-range" min="0" max="100" value="0" 
+                           oninput="applyConsistency(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Monotonic Increase -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="font-20">Monotonic Increase</h3>
+                    <p class="text-muted fs-5">Prediction should increase after transformation.</p>
+                    
+                    <div class="text-center mb-3">
+                        <img id="inc-img" src="{% static 'transform.png' %}" class="img-fluid rounded" style="max-height:180px;" alt="Increase">
+                        <div class="mt-3">
+                            <strong>Steering Angle:</strong> 
+                            <span id="inc-value" class="text-primary fw-bold">+3.2°</span>
+                        </div>
+                    </div>
+                    
+                    <label class="form-label">Transformation Intensity <span id="inc-val" class="float-end">0%</span></label>
+                    <input type="range" id="inc-slider" class="form-range" min="0" max="100" value="0" 
+                           oninput="applyMonotonicIncrease(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row g-3 mt-3">
+        <!-- Monotonic Decrease -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="font-20">Monotonic Decrease</h3>
+                    <p class="text-muted fs-5">Prediction should decrease after transformation.</p>
+                    
+                    <div class="text-center mb-3">
+                        <img id="dec-img" src="{% static 'transform.png' %}" class="img-fluid rounded" style="max-height:180px;" alt="Decrease">
+                        <div class="mt-3">
+                            <strong>Speed:</strong> 
+                            <span id="dec-value" class="text-primary fw-bold">45.2 km/h</span>
+                        </div>
+                    </div>
+                    
+                    <label class="form-label">Transformation Intensity <span id="dec-val" class="float-end">0%</span></label>
+                    <input type="range" id="dec-slider" class="form-range" min="0" max="100" value="0" 
+                           oninput="applyMonotonicDecrease(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bounded Inequality -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="font-20">Bounded Inequality</h3>
+                    <p class="text-muted fs-5">Prediction changes must remain within acceptable limits.</p>
+                    
+                    <div class="text-center mb-3">
+                        <canvas id="bound-canvas" width="260" height="140" style="border:1px solid #ddd; border-radius:8px;"></canvas>
+                        <div class="mt-2 small text-muted">
+                            Change: <strong id="bound-change">±4.1°</strong> 
+                            <span class="text-success">(Within Bounds)</span>
+                        </div>
+                    </div>
+                    
+                    <label class="form-label">Variation <span id="bound-val" class="float-end">0%</span></label>
+                    <input type="range" id="bound-slider" class="form-range" min="0" max="100" value="0" 
+                           oninput="applyBounded(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+            </div>
+            <!-- end tab-content -->
+
+
+
+        </div>
+        <!-- end wizard -->
+
+
+
+    </div>
+    <!-- end card-body -->
+
+
+</div>
+<!-- end card -->
+
+
+</div>
+<!-- end col -->
+
+
+</div>
+ 
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+ 
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
+          <div class="mb-2">
+            <h1 class="display-6 mb-0">
+                    Understanding Testing Concepts
+            </h1>
+                <p class="text-muted fs-4 mb-4">
+      Core concepts are important. <strong>Click</strong> What do these testing terms mean? to learn more
+    </p>
+          </div>
+          <button id="btn-toggle-guide" class="btn btn-sm btn-outline-primary mb-2" style="font-size: 15px;">
+            <i class="mdi mdi-school-outline me-1"></i> What do these testing terms mean?
+          </button>
+        </div>
+ 
+        <div id="concept-guide" class="row d-none">
+ 
+          <!-- 1. ORACLE PROBLEM -->
+          <div class="col-xl-4 col-md-6">
+            <div class="card concept-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar-sm concept-icon bg-soft-primary text-primary me-2">
+                    <i class="mdi mdi-help-circle-outline"></i>
+                  </div>
+                  <div>
+                    <span class="badge bg-primary concept-badge">01</span>
+                    <h5 class="header-title mb-0 mt-1">The Oracle Problem</h5>
+                  </div>
+                </div>
+                <div class="concept-stage" id="stage-oracle">
+                  <div class="oracle-king">👑</div>
+                  <div class="oracle-farmer">🧑‍🌾</div>
+                  <div class="oracle-bubble">?</div>
+                  <div class="oracle-machine">🔮</div>
+                </div>
+                <p class="text-muted mt-3 mb-2 concept-text">A farmer asks a magic machine if it will rain. It says yes. But it can't explain how it knows. So how do we check if it's right?</p>
+                <details class="concept-details">
+                  <summary class="fw-semibold text-primary">Definition &amp; example</summary>
+                  <p class="text-muted mt-2 mb-0">This is the challenge of knowing the correct output when there's no easy way to verify it. A math problem like <code>5 + 5 = 10</code> has one right answer. An AI's prediction usually does not.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- 2. BLACK-BOX TESTING -->
+          <div class="col-xl-4 col-md-6">
+            <div class="card concept-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar-sm concept-icon bg-soft-secondary text-secondary me-2">
+                    <i class="mdi mdi-cube-outline"></i>
+                  </div>
+                  <div>
+                    <span class="badge bg-secondary concept-badge">02</span>
+                    <h5 class="header-title mb-0 mt-1">Black-Box Testing</h5>
+                  </div>
+                </div>
+                <div class="concept-stage" id="stage-blackbox">
+                  <div class="bb-arrow-in">Input</div>
+                  <div class="bb-box">
+                    <span class="bb-gear">⚙️</span>
+                    <span class="bb-gear bb-gear2">⚙️</span>
+                  </div>
+                  <div class="bb-arrow-out">Output</div>
+                </div>
+                <p class="text-muted mt-3 mb-2 concept-text">Picture a calculator you can't open. You press buttons and get an answer. You never see the gears turning inside.</p>
+                <details class="concept-details">
+                  <summary class="fw-semibold text-secondary">Definition &amp; example</summary>
+                  <p class="text-muted mt-2 mb-0">We test a system using only its inputs and outputs. We never look inside. This platform just feeds the model frames and watches what comes out.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- 3. METAMORPHIC RELATIONS -->
+          <div class="col-xl-4 col-md-6">
+            <div class="card concept-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar-sm concept-icon bg-soft-warning text-warning me-2">
+                    <i class="mdi mdi-sync"></i>
+                  </div>
+                  <div>
+                    <span class="badge bg-warning concept-badge">03</span>
+                    <h5 class="header-title mb-0 mt-1">Metamorphic Relations</h5>
+                  </div>
+                </div>
+                <div class="concept-stage" id="stage-mr">
+                  <div class="mr-pizza">
+                    <div class="mr-base"></div>
+                    <div class="mr-cheese"></div>
+                  </div>
+                </div>
+                <p class="text-muted mt-3 mb-2 concept-text">Add extra cheese to a pizza. You don't know the exact taste score. But it should never taste less cheesy.</p>
+                <details class="concept-details">
+                  <summary class="fw-semibold text-warning">Definition &amp; example</summary>
+                  <p class="text-muted mt-2 mb-0">This is a rule for how output should change when input changes slightly.For example, a small brightness change in an autonomous vehicle camera image should not cause the car to make an extreme steering decision. We ask if the result is consistent, not if it's correct.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- 4. ROBUSTNESS TESTING -->
+          <div class="col-xl-4 col-md-6">
+            <div class="card concept-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar-sm concept-icon bg-soft-info text-info me-2">
+                    <i class="mdi mdi-weather-pouring"></i>
+                  </div>
+                  <div>
+                    <span class="badge bg-info concept-badge">04</span>
+                    <h5 class="header-title mb-0 mt-1">Robustness Testing</h5>
+                  </div>
+                </div>
+                <div class="concept-stage" id="stage-robust">
+                  <div class="rain-drop d1"></div>
+                  <div class="rain-drop d2"></div>
+                  <div class="rain-drop d3"></div>
+                  <div class="rain-drop d4"></div>
+                  <div class="robust-road"></div>
+                  <div class="robust-car">🚗</div>
+                </div>
+                <p class="text-muted mt-3 mb-2 concept-text">A driver trained on sunny roads suddenly hits rain and fog. Can they still drive safely?</p>
+                <details class="concept-details">
+                  <summary class="fw-semibold text-info">Definition &amp; example</summary>
+                  <p class="text-muted mt-2 mb-0">We check if an AI keeps working when inputs get noisy or blurry. A tiny change in the input should never cause a wild change in the output.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- 5. TEMPORAL CONSISTENCY -->
+          <div class="col-xl-4 col-md-6">
+            <div class="card concept-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar-sm concept-icon bg-soft-success text-success me-2">
+                    <i class="mdi mdi-clock-outline"></i>
+                  </div>
+                  <div>
+                    <span class="badge bg-success concept-badge">05</span>
+                    <h5 class="header-title mb-0 mt-1">Temporal Consistency</h5>
+                  </div>
+                </div>
+                <div class="concept-stage" id="stage-temporal">
+                  <div class="clock-face">
+                    <div class="clock-hand"></div>
+                  </div>
+                  <div class="temporal-bubble">Mon: "Rain Tue"</div>
+                </div>
+                <p class="text-muted mt-3 mb-2 concept-text">On Monday it says it will rain tomorrow. On Tuesday it says yesterday was sunny. Something doesn't add up.</p>
+                <details class="concept-details">
+                  <summary class="fw-semibold text-success">Definition &amp; example</summary>
+                  <p class="text-muted mt-2 mb-0">We check that predictions stay logical over time. One frame's result shouldn't wildly contradict the next, unless the scene really changed.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+ 
+          <!-- 6. MODEL-AGNOSTIC -->
+          <div class="col-xl-4 col-md-6">
+            <div class="card concept-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar-sm concept-icon bg-soft-danger text-danger me-2">
+                    <i class="mdi mdi-wrench-outline"></i>
+                  </div>
+                  <div>
+                    <span class="badge bg-danger concept-badge">06</span>
+                    <h5 class="header-title mb-0 mt-1">Model-Agnostic</h5>
+                  </div>
+                </div>
+                <div class="concept-stage" id="stage-agnostic">
+                  <div class="mech-wrench">🔧</div>
+                  <div class="mech-car mc1">🚙</div>
+                  <div class="mech-car mc2">🚗</div>
+                  <div class="mech-car mc3">🚕</div>
+                </div>
+                <p class="text-muted mt-3 mb-2 concept-text">A mechanic doesn't care if it's a Toyota, a BMW, or a Tesla. The same checks work on every car.</p>
+                <details class="concept-details">
+                  <summary class="fw-semibold text-danger">Definition &amp; example</summary>
+                  <p class="text-muted mt-2 mb-0">This testing method doesn't depend on the model's internals. It works the same for a neural network, a random forest, or an SVM.</p>
+                </details>
+              </div>
+            </div>
+          </div>
+ 
+        </div><!-- /#concept-guide -->
+ 
+      </div><!-- /.card-body -->
+    </div><!-- /.card -->
+  </div><!-- /.col-12 -->
+</div>
+<!-- ===================== END CONCEPT GUIDE SECTION ===================== -->
+<!-- end row -->
+ <div class="card">
+  <div class="card-body p-4">
+
+    <div class="d-flex align-items-center gap-2 mb-2">
+    </div>
+    <h1 class="display-6 mb-0">Metamorphic Testing Overview</h1>
+    <p class="text-muted fs-4 mb-4">
+      Metamorphic testing checks <strong>relationships between outputs</strong> instead of validating
+      exact outputs against fixed labels.
+    </p>
+
+    <ul class="nav nav-pills mr-nav-pills mb-4 gap-2" id="mrTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active fs-4 d-flex align-items-center gap-1" data-tab="idea" type="button" role="tab">
+          <i class="mdi mdi-shuffle-variant"></i> Core Idea
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fs-4 d-flex align-items-center gap-1" data-tab="example" type="button" role="tab">
+          <i class="mdi mdi-flask-outline"></i> Worked Example
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fs-4 d-flex align-items-center gap-1" data-tab="types" type="button" role="tab">
+          <i class="mdi mdi-shape-outline"></i> Types of MR
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fs-4 d-flex align-items-center gap-1" data-tab="project" type="button" role="tab">
+          <i class="mdi mdi-code-braces"></i> Project Relations
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fs-4 d-flex align-items-center gap-1" data-tab="epsilon" type="button" role="tab">
+          <i class="mdi mdi-tune-variant"></i> Epsilon & Threshold
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fs-4 d-flex align-items-center gap-1" data-tab="transforms" type="button" role="tab">
+          <i class="mdi mdi-image-multiple-outline"></i> Transformations
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fs-4 d-flex align-items-center gap-1" data-tab="metrics" type="button" role="tab">
+          <i class="mdi mdi-chart-box-outline"></i> Metrics
+        </button>
+      </li>
+    </ul>
+
+    <!-- ============ CORE IDEA ============ -->
+    <div class="mr-pane" data-pane="idea">
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 bg-warning-subtle h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-warning text-white fs-4"><i class="mdi mdi-image-edit-outline"></i></span>
+                <span class="fw-semibold fs-4">Transformation — <code>T</code></span>
+              </div>
+              <p class="text-muted fs-4 mb-0">
+                The <strong>recipe</strong> that turns the original input into a new test input.
+                It only touches <em>x</em> — it never looks at the model.
+                Example: <em>"rotate the image by 15°."</em>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 bg-info-subtle h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-info text-white fs-4"><i class="mdi mdi-compare-horizontal"></i></span>
+                <span class="fw-semibold fs-4">Relation — <code>MR</code></span>
+              </div>
+              <p class="text-muted fs-4 mb-0">
+                The <strong>rule</strong> that says how the two outputs, <em>y</em> and <em>y′</em>, ought
+                to compare once <em>T</em> has been applied. Example: <em>"rotating the image shouldn't
+                change the predicted class."</em>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-light border fs-4 mb-4">
+        <i class="mdi mdi-lightbulb-on-outline me-1"></i>
+        They're two different jobs on the same test case: <strong>T</strong> builds the new input,
+        <strong>MR</strong> judges the pair of outputs it produces. "Shouldn't change" is only one
+        kind of MR — see the <strong>Types of MR</strong> tab for the others, and
+        <strong>Worked Example</strong> for a full run-through with real numbers.
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="card bg-light border-0 border-start border-4 border-danger h-100">
+            <div class="card-body">
+              <div class="text-muted fs-5 text-uppercase mb-1"><i class="mdi mdi-close-circle-outline me-1"></i>Traditional testing</div>
+              <code class="fs-4">f(x) = y</code>
+              <p class="text-muted fs-5 mb-0 mt-2">Requires a known, exact expected output for every input.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card bg-light border-0 border-start border-4 border-success h-100">
+            <div class="card-body">
+              <div class="text-muted fs-5 text-uppercase mb-1"><i class="mdi mdi-check-circle-outline me-1"></i>Metamorphic testing</div>
+              <code class="fs-4">MR(x, T(x), y, y′)</code>
+              <p class="text-muted fs-5 mb-0 mt-2">Only requires that the <em>relationship</em> between two outputs holds.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border h-100 mb-4">
+        <div class="card-body">
+          <div class="fs-5 text-uppercase text-muted mb-3"><i class="mdi mdi-source-branch me-1"></i>How it flows</div>
+
+          <div class="d-flex flex-column flex-xl-row align-items-center justify-content-center gap-3 mr-flow">
+
+            <div class="d-flex flex-column gap-3">
+              <div class="d-flex align-items-center gap-2">
+                <div class="mr-step text-center">
+                  <div class="avatar-sm mx-auto mb-1">
+                    <div class="avatar-title rounded-circle bg-primary-subtle text-primary fs-3">
+                      <i class="mdi mdi-image-outline"></i>
+                    </div>
+                  </div>
+                  <div class="fw-semibold fs-5">x</div>
+                  <div class="text-muted fs-5">original input</div>
+                </div>
+                <div class="mr-arrow text-muted fs-1">&rarr;</div>
+                <div class="mr-step text-center">
+                  <div class="avatar-sm mx-auto mb-1">
+                    <div class="avatar-title rounded-circle bg-primary text-white fs-3">
+                      <i class="mdi mdi-cog-outline"></i>
+                    </div>
+                  </div>
+                  <div class="fw-semibold fs-5">Model</div>
+                  <div class="text-muted fs-5">y = f(x)</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-2">
+                <div class="mr-step text-center">
+                  <div class="avatar-sm mx-auto mb-1">
+                    <div class="avatar-title rounded-circle bg-warning-subtle text-warning fs-3">
+                      <i class="mdi mdi-image-edit-outline"></i>
+                    </div>
+                  </div>
+                  <div class="fw-semibold fs-5">T(x)</div>
+                  <div class="text-muted fs-5">transformed input</div>
+                </div>
+                <div class="mr-arrow text-muted fs-1">&rarr;</div>
+                <div class="mr-step text-center">
+                  <div class="avatar-sm mx-auto mb-1">
+                    <div class="avatar-title rounded-circle bg-warning text-white fs-3">
+                      <i class="mdi mdi-cog-outline"></i>
+                    </div>
+                  </div>
+                  <div class="fw-semibold fs-5">Model</div>
+                  <div class="text-muted fs-5">y′ = f(T(x))</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mr-arrow text-muted fs-1 mr-arrow-rotate">&rarr;</div>
+
+            <div class="mr-step text-center">
+              <div class="avatar-md mx-auto mb-1">
+                <div class="avatar-title rounded-circle bg-info text-white fs-1">
+                  <i class="mdi mdi-compare-horizontal"></i>
+                </div>
+              </div>
+              <div class="fw-semibold fs-5">Comparator</div>
+              <div class="text-muted fs-5">checks the MR</div>
+            </div>
+
+            <div class="mr-arrow text-muted fs-1">&rarr;</div>
+
+            <div class="mr-step text-center">
+              <span class="badge fs-4 px-3 py-2" id="verdictBadge">
+                <i class="mdi mdi-check-circle me-1"></i>PASS
+              </span>
+              <div class="text-muted fs-5 mt-1">MR(x,T(x),y,y′)</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-2">
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary-subtle text-primary fs-5">x</span>
+            <span class="text-muted fs-5">original input</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning-subtle text-warning fs-5">T(x)</span>
+            <span class="text-muted fs-5">transformed input</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary-subtle text-primary fs-5">y</span>
+            <span class="text-muted fs-5">y = f(x)</span>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning-subtle text-warning fs-5">y′</span>
+            <span class="text-muted fs-5">y′ = f(T(x))</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ WORKED EXAMPLE ============ -->
+    <div class="mr-pane d-none" data-pane="example">
+
+      <div class="alert alert-light border fs-4 mb-4">
+        <i class="mdi mdi-car-outline me-1"></i>
+        <strong>Scenario:</strong> a self-driving model <code>f</code> looks at a road photo and predicts
+        a steering angle in degrees. We want to test it against changing light — without needing to know
+        the "correct" angle for every possible photo.
+      </div>
+
+      <div class="card border mb-4">
+        <div class="card-body">
+          <div class="row g-4 align-items-stretch">
+
+            <div class="col-md-3">
+              <div class="text-center h-100 d-flex flex-column justify-content-center">
+                <div class="avatar-md mx-auto mb-2">
+                  <div class="avatar-title rounded-circle bg-primary-subtle text-primary fs-2"><i class="mdi mdi-image-outline"></i></div>
+                </div>
+                <div class="fw-semibold fs-4">x</div>
+                <div class="text-muted fs-4 mb-2">daytime road photo</div>
+                <div class="fs-4">f(x) = <strong>12.4°</strong></div>
+                <div class="text-muted fs-4">y</div>
+              </div>
+            </div>
+
+            <div class="col-md-1 d-flex align-items-center justify-content-center">
+              <span class="fs-1 text-warning"><i class="mdi mdi-arrow-right-thick"></i></span>
+            </div>
+
+            <div class="col-md-3">
+              <div class="text-center h-100 d-flex flex-column justify-content-center">
+                <span class="badge bg-warning-subtle text-warning fs-4 mb-2"><i class="mdi mdi-white-balance-sunny me-1"></i>T: brightness ×1.4</span>
+                <div class="avatar-md mx-auto mb-2">
+                  <div class="avatar-title rounded-circle bg-warning-subtle text-warning fs-2"><i class="mdi mdi-image-edit-outline"></i></div>
+                </div>
+                <div class="fw-semibold fs-4">T(x)</div>
+                <div class="text-muted fs-4">same road, sunset lighting</div>
+              </div>
+            </div>
+
+            <div class="col-md-1 d-flex align-items-center justify-content-center">
+              <span class="fs-1 text-warning"><i class="mdi mdi-arrow-right-thick"></i></span>
+            </div>
+
+            <div class="col-md-3">
+              <div class="text-center h-100 d-flex flex-column justify-content-center">
+                <div class="avatar-md mx-auto mb-2">
+                  <div class="avatar-title rounded-circle bg-warning text-white fs-2"><i class="mdi mdi-cog-outline"></i></div>
+                </div>
+                <div class="fw-semibold fs-4">f(T(x))</div>
+                <div class="fs-4">= <strong>13.1°</strong></div>
+                <div class="text-muted fs-4">y′</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="card h-100 border">
+            <div class="card-body">
+              <div class="fw-semibold fs-4 mb-2"><i class="mdi mdi-compare-horizontal me-1 text-info"></i>The MR, in plain English</div>
+              <p class="text-muted fs-4 mb-0">
+                "Lighting shouldn't meaningfully change the steering decision." Nothing here says what
+                the angle should <em>be</em> — only that it shouldn't move much between <em>x</em> and <em>T(x)</em>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100 border">
+            <div class="card-body">
+              <div class="fw-semibold fs-4 mb-2"><i class="mdi mdi-function-variant me-1 text-info"></i>The MR, formally</div>
+              <code class="d-block fs-4 mb-2">|f(x) − f(T(x))| &lt; ε</code>
+              <div class="text-muted fs-4">|12.4 − 13.1| = <strong>0.7°</strong>, checked against ε below</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border mb-4">
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-center gap-3">
+            <div class="fs-4"><strong>ε</strong> = 0.05 × (max(Y) − min(Y)) = 0.05 × (35° − (−5°)) = <strong>2.0°</strong></div>
+            <div class="fs-4 text-muted">|Δ| = 0.7° &lt; ε = 2.0° →</div>
+            <span class="badge bg-success-subtle text-success fs-4 px-3 py-2"><i class="mdi mdi-check-circle me-1"></i>PASS</span>
+          </div>
+          <div class="text-muted fs-4 mt-2">
+            If instead <em>T</em> had been "paint a stop sign onto the road" and the angle barely moved,
+            that same MR would <strong>FAIL</strong> — the relation would flag a real robustness gap.
+          </div>
+        </div>
+      </div>
+
+      <div class="fw-semibold fs-4 mb-2">A few more T ↔ MR pairs, across domains</div>
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle fs-4">
+          <thead class="table-light">
+            <tr>
+              <th>Domain</th>
+              <th>Transformation T(x)</th>
+              <th>Metamorphic Relation MR</th>
+              <th>Verdict logic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Image classifier</td>
+              <td>Rotate photo 10°</td>
+              <td>Predicted class shouldn't change</td>
+              <td><code>label(f(x)) == label(f(T(x)))</code></td>
+            </tr>
+            <tr>
+              <td>Sentiment analysis</td>
+              <td>Swap a word for a synonym</td>
+              <td>Sentiment score shouldn't change</td>
+              <td><code>|f(x) − f(T(x))| &lt; ε</code></td>
+            </tr>
+            <tr>
+              <td>Self-driving (this example)</td>
+              <td>Increase brightness ×1.4</td>
+              <td>Steering angle shouldn't change much</td>
+              <td><code>|f(x) − f(T(x))| &lt; ε</code></td>
+            </tr>
+            <tr>
+              <td>Search ranking</td>
+              <td>Reorder two identical result lists</td>
+              <td>Top result should stay the same</td>
+              <td><code>top(f(x)) == top(f(T(x)))</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ============ TYPES OF MR ============ -->
+    <div class="mr-pane d-none" data-pane="types">
+      <div class="alert alert-light border fs-4 mb-4">
+        <i class="mdi mdi-information-outline me-1"></i>
+        "Output shouldn't change" is just the strictest MR — <strong>invariance</strong>. The real
+        definition is broader: an MR is <strong>any rule that says how y and y′ must relate</strong>,
+        given how T changed x. Direction, proportion, and bounded drift are equally valid MRs.
+      </div>
+      <div class="row g-3" id="typeCards"></div>
+    </div>
+
+    <!-- ============ PROJECT RELATIONS ============ -->
+    <div class="mr-pane d-none" data-pane="project">
+      <div class="alert alert-light border fs-4 mb-4">
+        <i class="mdi mdi-code-braces me-1"></i>
+        These are the exact <code>MetamorphicRelation</code> classes used in this project's test suite —
+        each one checked with <code>check(y1, y2)</code> against a fixed <code>ε</code>.
+      </div>
+      <div class="accordion" id="projectAccordion"></div>
+    </div>
+
+    <!-- ============ EPSILON ============ -->
+    <div class="mr-pane d-none" data-pane="epsilon">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="card h-100 border">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="avatar-sm">
+                  <div class="avatar-title rounded-circle bg-warning-subtle text-warning fs-3">
+                    <i class="mdi mdi-arrow-expand-horizontal"></i>
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-semibold fs-4">Global</div>
+                  <div class="text-muted fs-5">range-based</div>
+                </div>
+              </div>
+              <p class="text-muted fs-5">One fixed tolerance for the whole dataset, scaled by how spread out the outputs are.</p>
+              <code class="d-block fs-4 mb-3">ε = a · (max(Y) − min(Y))</code>
+              <div class="progress mb-2" style="height:10px;">
+                <div class="progress-bar bg-warning" style="width:40%"></div>
+              </div>
+              <div class="text-muted fs-5 mb-3">same width for every sample</div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item px-0 fs-5"><code>a</code> — sensitivity factor, e.g. 0.05</li>
+                <li class="list-group-item px-0 fs-5"><code>Y</code> — the set of all outputs/labels</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100 border">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div class="avatar-sm">
+                  <div class="avatar-title rounded-circle bg-info-subtle text-info fs-3">
+                    <i class="mdi mdi-target"></i>
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-semibold fs-4">Local</div>
+                  <div class="text-muted fs-5">prediction-aware</div>
+                </div>
+              </div>
+              <p class="text-muted fs-5">Tolerance adapts to the size of the current prediction, not the dataset as a whole.</p>
+              <code class="d-block fs-4 mb-3">|f(x) − f(T(x))| / (|f(x)| + δ) &lt; a</code>
+              <div class="progress mb-2" style="height:10px;">
+                <div class="progress-bar bg-info mr-local-bar"></div>
+              </div>
+              <div class="text-muted fs-5 mb-3">width adapts per sample</div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item px-0 fs-5"><code>f(x)</code> — prediction on the original input</li>
+                <li class="list-group-item px-0 fs-5"><code>a</code> — sensitivity factor, e.g. 0.05</li>
+                <li class="list-group-item px-0 fs-5"><code>δ</code> — small constant, e.g. 10⁻⁶, avoids divide-by-zero</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-light border fs-5 mb-0">
+        <i class="mdi mdi-lightbulb-on-outline me-1"></i>
+        Global ε fixes one tolerance for the whole dataset; local ε adapts per-sample, so a prediction
+        near zero isn't held to the same absolute tolerance as a large one.
+      </div>
+    </div>
+
+    <!-- ============ TRANSFORMATIONS ============ -->
+    <div class="mr-pane d-none" data-pane="transforms">
+      <div class="accordion" id="transformAccordion"></div>
+    </div>
+
+    <!-- ============ METRICS ============ -->
+    <div class="mr-pane d-none" data-pane="metrics">
+      <div class="row g-3" id="metricCards"></div>
+    </div>
+
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Animation + tiny layout helpers only — colors/sizing come from theme utility classes */
+  .mr-arrow{ animation: mrArrowNudge 1.3s ease-in-out infinite; }
+  @keyframes mrArrowNudge{
+    0%, 100% { transform: translateX(0); opacity: .6; }
+    50% { transform: translateX(4px); opacity: 1; }
+  }
+  #verdictBadge{ animation: mrVerdictSwap 3s steps(1) infinite; }
+  @keyframes mrVerdictSwap{ 0%,60%{ } 61%,100%{ } }
+  .mr-local-bar{ animation: mrLocalBarWidth 3.4s ease-in-out infinite; }
+  @keyframes mrLocalBarWidth{
+    0%, 100% { width: 20%; }
+    50% { width: 65%; }
+  }
+  @media (min-width: 1200px){
+    .mr-flow{ flex-wrap: nowrap; }
+  }
+</style>
+
+<script>
+(function(){
+  const categories = [
+    {
+      key: 'photometric', label: 'Photometric', color: 'primary', icon: 'mdi-white-balance-sunny',
+      note: 'Changes to color, brightness and light — not shape.',
+      items: [
+        ['Brightness', 'T(x) = x · β', 'β > 1 brighter, β < 1 darker'],
+        ['Contrast', 'T(x) = (x − μ)·α + μ', 'μ = mean intensity, α = contrast factor'],
+        ['Fog / Weather', 'T(x) = x·(1−A) + A·Λ', 'A = fog density, Λ = atmospheric light']
+      ]
+    },
+    {
+      key: 'geometric', label: 'Geometric', color: 'warning', icon: 'mdi-axis-arrow',
+      note: 'Changes to position, orientation or symmetry.',
+      items: [
+        ['Translation', 'T(x)(x,y) = x(x−Δx, y−Δy)', 'Shift image by (Δx, Δy)'],
+        ['Rotation', 'T(x) = R(θ)·x', 'Rotation by angle θ'],
+        ['Flip Symmetry', 'T(x) = flip(x)', 'Expected relation: f(T(x)) ≈ f(x)'],
+        ['Lane Shift', 'T(x) = x + Δ_lane', 'Shift scene content along the lane axis']
+      ]
+    },
+    {
+      key: 'noise', label: 'Noise & Blur', color: 'info', icon: 'mdi-blur',
+      note: 'Signal-quality degradation, not scene content.',
+      items: [
+        ['Noise', 'T(x) = x + N(0, σ²)', 'Additive Gaussian noise, variance σ²'],
+        ['Blur', 'T(x) = x * K', 'Convolution with kernel K, e.g. Gaussian blur']
+      ]
+    },
+    {
+      key: 'temporal', label: 'Temporal', color: 'success', icon: 'mdi-clock-outline',
+      note: 'Consistency checks across time, not a single frame.',
+      items: [
+        ['Temporal Smoothness', '|f(x_t) − f(x_(t+1))| < δ', 'Consecutive-frame prediction should change slowly']
+      ]
+    },
+    {
+      key: 'composition', label: 'Composition', color: 'secondary', icon: 'mdi-vector-combine',
+      note: 'Chaining transforms from the other categories together.',
+      items: [
+        ['Composition', 'T(x) = T2(T1(x))', 'Chain two or more transforms together']
+      ]
+    }
+  ];
+
+  const accHtml = categories.map(function(cat, i){
+    const itemsHtml = cat.items.map(function(it){
+      return '<div class="col-md-4">' +
+        '<div class="card h-100 border">' +
+          '<div class="card-body">' +
+            '<div class="fw-semibold fs-5 mb-1">' + it[0] + '</div>' +
+            '<code class="fs-5 d-block mb-1">' + it[1] + '</code>' +
+            '<div class="text-muted fs-5">' + it[2] + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    return (
+      '<div class="accordion-item">' +
+        '<h2 class="accordion-header">' +
+          '<button class="accordion-button ' + (i === 0 ? '' : 'collapsed') + '" type="button" data-bs-toggle="collapse" data-bs-target="#cat-' + cat.key + '">' +
+            '<span class="badge bg-' + cat.color + '-subtle text-' + cat.color + ' fs-5 me-2"><i class="mdi ' + cat.icon + '"></i></span>' +
+            '<span class="fw-semibold fs-4 me-2">' + cat.label + '</span>' +
+            '<span class="text-muted fs-5">' + cat.note + '</span>' +
+          '</button>' +
+        '</h2>' +
+        '<div id="cat-' + cat.key + '" class="accordion-collapse collapse ' + (i === 0 ? 'show' : '') + '" data-bs-parent="#transformAccordion">' +
+          '<div class="accordion-body">' +
+            '<div class="row g-3">' + itemsHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+  document.getElementById('transformAccordion').innerHTML = accHtml;
+
+  const metrics = [
+    ['Prediction Difference (Δ)', 'mdi-delta', 'primary', 'Δ = |f(x) − f(T(x))|', 'Measures output change'],
+    ['Adaptive Threshold (ε)', 'mdi-tune-variant', 'warning', 'ε = a × (max(Y) − min(Y))', 'Defines tolerance'],
+    ['MR Validation', 'mdi-check-decagram-outline', 'success', '|f(x) − f(T(x))| < ε', 'PASS / FAIL condition'],
+    ['Relative Change', 'mdi-percent-outline', 'info', '|f(x) − f(T(x))| / (|f(x)| + δ) < a', 'Scale-independent check'],
+    ['Failure Rate', 'mdi-alert-circle-outline', 'danger', 'Failed / Total', 'Failure proportion'],
+    ['Severity', 'mdi-gauge', 'secondary', '(1/N) · Σ |f(x) − f(T(x))|', 'Avg. output deviation'],
+    ['Robustness Score', 'mdi-shield-check-outline', 'primary', 'Passed MRs / Total MRs', 'Model robustness'],
+    ['Generalization Score', 'mdi-share-variant-outline', 'info', 'Models passing MR / Total models', 'Cross-model consistency'],
+    ['Parametric Sweep', 'mdi-tune', 'warning', 'T(x; λ), λ ∈ [λ_min, λ_max]', 'Vary transformation strength']
+  ];
+
+  const metricHtml = metrics.map(function(m){
+    return '<div class="col-md-6 col-lg-4">' +
+      '<div class="card h-100 border">' +
+        '<div class="card-body">' +
+          '<div class="d-flex align-items-center gap-2 mb-2">' +
+            '<div class="avatar-sm"><div class="avatar-title rounded-circle bg-' + m[2] + '-subtle text-' + m[2] + ' fs-3"><i class="mdi ' + m[1] + '"></i></div></div>' +
+            '<div class="fw-semibold fs-5">' + m[0] + '</div>' +
+          '</div>' +
+          '<code class="fs-5 d-block mb-2">' + m[3] + '</code>' +
+          '<div class="text-muted fs-5">' + m[4] + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('metricCards').innerHTML = metricHtml;
+
+  const mrTypes = [
+    {
+      name: 'Invariance', color: 'primary', icon: 'mdi-equal',
+      rule: 'f(x) == f(T(x))',
+      plain: 'Output must stay exactly the same.',
+      example: 'Rotate an image 15° → predicted class stays "cat".'
+    },
+    {
+      name: 'Bounded Difference', color: 'info', icon: 'mdi-arrow-expand-horizontal',
+      rule: '|f(x) − f(T(x))| < ε',
+      plain: 'Small drift is fine, big drift is not.',
+      example: 'Brighten a road photo → steering angle wobbles by < 2°, not 10°.'
+    },
+    {
+      name: 'Directional / Monotonic', color: 'success', icon: 'mdi-trending-up',
+      rule: 'f(T(x)) > f(x)',
+      plain: 'Output must move a specific way, not just "stay put".',
+      example: "Raise the applicant's income → approval probability must not drop."
+    },
+    {
+      name: 'Proportional / Scaling', color: 'warning', icon: 'mdi-chart-line',
+      rule: 'f(T(x)) ≈ k · f(x)',
+      plain: 'Output should scale in step with the input change.',
+      example: 'Double all demand-forecast quantities → predicted revenue roughly doubles.'
+    },
+    {
+      name: 'Permutation / Symmetry', color: 'secondary', icon: 'mdi-shuffle-variant',
+      rule: 'f(x) == f(shuffle(x))',
+      plain: "Reordering or relabeling inputs shouldn't matter.",
+      example: 'Shuffle point order in a point cloud → segmentation output is unchanged.'
+    },
+    {
+      name: 'Additive / Compositional', color: 'danger', icon: 'mdi-plus-box-outline',
+      rule: 'f(x1+x2) ≈ f(x1) + f(x2)',
+      plain: 'How inputs combine should predict how outputs combine.',
+      example: "Overlay two independent noise patterns → error roughly adds, doesn't cancel or explode."
+    }
+  ];
+
+  const typeHtml = mrTypes.map(function(t){
+    return '<div class="col-md-6 col-lg-4">' +
+      '<div class="card h-100 border">' +
+        '<div class="card-body">' +
+          '<div class="d-flex align-items-center gap-2 mb-2">' +
+            '<div class="avatar-sm"><div class="avatar-title rounded-circle bg-' + t.color + '-subtle text-' + t.color + ' fs-3"><i class="mdi ' + t.icon + '"></i></div></div>' +
+            '<div class="fw-semibold fs-5">' + t.name + '</div>' +
+          '</div>' +
+          '<code class="fs-5 d-block mb-2">' + t.rule + '</code>' +
+          '<div class="text-muted fs-5 mb-2">' + t.plain + '</div>' +
+          '<div class="border-top pt-2 fs-5"><span class="fw-semibold text-' + t.color + '">Example: </span>' + t.example + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('typeCards').innerHTML = typeHtml;
+
+  const projectGroups = [
+    {
+      key: 'visual', label: 'Visual Invariance', color: 'primary', icon: 'mdi-image-outline',
+      note: 'InvarianceRelation subclasses — type "equality" — change |y1 − y2| / (|y1| + 1e-6) < ε',
+      formula: '|y1 − y2| / (|y1| + 1e-6) < ε',
+      items: [
+        ['BrightnessRelation', 0.02, 'Output should remain approximately same under localized brightness change.'],
+        ['ContrastRelation', 0.03, 'Contrast change should not significantly affect output.'],
+        ['BlurRelation', 0.03, 'Blur should not significantly change output.'],
+        ['NoiseRelation', 0.03, 'Noise should not significantly affect prediction.'],
+        ['RotationRelation', 0.05, 'Small rotation should not significantly change output.'],
+        ['TranslationRelation', 0.05, 'Small translation should preserve prediction consistency.'],
+        ['CompositeRelation', 0.05, 'Prediction should remain approximately consistent under composite transformations.']
+      ]
+    },
+    {
+      key: 'weather', label: 'Weather / Visibility Invariance', color: 'info', icon: 'mdi-weather-fog',
+      note: 'Also InvarianceRelation subclasses — same equality check, one class per weather condition',
+      formula: '|y1 − y2| / (|y1| + 1e-6) < ε',
+      items: [
+        ['RainRelation', 0.05, 'Rain should not significantly affect prediction.'],
+        ['SnowRelation', 0.05, 'Snow should not significantly affect prediction.'],
+        ['FogRelation', 0.05, 'Fog should not significantly affect prediction.'],
+        ['SandstormRelation', 0.06, 'Sandstorm should not significantly affect prediction.'],
+        ['DustRelation', 0.05, 'Dust should not significantly affect prediction.'],
+        ['HazeRelation', 0.04, 'Haze should not significantly affect prediction.'],
+        ['SmokeRelation', 0.05, 'Smoke should not significantly affect prediction.']
+      ]
+    },
+    {
+      key: 'temporal', label: 'Temporal', color: 'success', icon: 'mdi-clock-outline',
+      note: 'TemporalRelation subclasses — type "temporal" — checks across consecutive/nearby frames',
+      formula: '|y1 − y2| / (|y1| + 1e-6) < ε',
+      items: [
+        ['TemporalSmoothnessRelation', 0.03, 'Predictions should change smoothly across consecutive frames.'],
+        ['TemporalConsistencyRelation', 0.05, 'Nearby frames should produce consistent outputs.']
+      ]
+    },
+    {
+      key: 'inequality', label: 'Inequality / Directional', color: 'warning', icon: 'mdi-arrow-decision-outline',
+      note: 'type "inequality" — bounds or a direction on the change, not a tight equality',
+      formula: 'varies per class — see each card',
+      items: [
+        ['DarkVisibilityRelation', 0.10, 'Output should not change drastically under visibility degradation.', '|y2 − y1| / (|y1| + 1e-6) ≤ ε'],
+        ['MonotonicIncreaseRelation', null, 'Output should increase after transformation.', 'y2 ≥ y1'],
+        ['MonotonicDecreaseRelation', null, 'Output should decrease after transformation.', 'y2 ≤ y1'],
+        ['InequalityRelation', 0.20, 'Output should remain within the allowed inequality bound.', 'transformed ≤ original + ε']
+      ]
+    },
+    {
+      key: 'special', label: 'Special: Antisymmetry', color: 'danger', icon: 'mdi-swap-horizontal',
+      note: 'FlipRelation — the odd one out: it expects the output to invert, not stay the same',
+      formula: '|y2 + y1| / (|y1| + 1e-6) < ε',
+      items: [
+        ['FlipRelation', 0.10, 'Flipped image should invert steering.', '|y2 + y1| / (|y1| + 1e-6) < ε']
+      ]
+    }
+  ];
+
+  const projAccHtml = projectGroups.map(function(grp, i){
+    const itemsHtml = grp.items.map(function(it){
+      const name = it[0], eps = it[1], desc = it[2], customFormula = it[3];
+      const epsBadge = (eps === null)
+        ? '<span class="badge bg-secondary-subtle text-secondary fs-5">no ε — direction only</span>'
+        : '<span class="badge bg-' + grp.color + '-subtle text-' + grp.color + ' fs-5">ε = ' + eps + '</span>';
+      return '<div class="col-md-6 col-lg-4">' +
+        '<div class="card h-100 border">' +
+          '<div class="card-body">' +
+            '<div class="d-flex align-items-center justify-content-between mb-2">' +
+              '<code class="fs-5 fw-semibold">' + name + '</code>' +
+              epsBadge +
+            '</div>' +
+            '<code class="fs-5 d-block mb-2 text-muted">' + (customFormula || grp.formula) + '</code>' +
+            '<div class="text-muted fs-5">' + desc + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    return (
+      '<div class="accordion-item">' +
+        '<h2 class="accordion-header">' +
+          '<button class="accordion-button ' + (i === 0 ? '' : 'collapsed') + '" type="button" data-bs-toggle="collapse" data-bs-target="#proj-' + grp.key + '">' +
+            '<span class="badge bg-' + grp.color + '-subtle text-' + grp.color + ' fs-5 me-2"><i class="mdi ' + grp.icon + '"></i></span>' +
+            '<span class="fw-semibold fs-4 me-2">' + grp.label + '</span>' +
+            '<span class="text-muted fs-5">' + grp.note + '</span>' +
+          '</button>' +
+        '</h2>' +
+        '<div id="proj-' + grp.key + '" class="accordion-collapse collapse ' + (i === 0 ? 'show' : '') + '" data-bs-parent="#projectAccordion">' +
+          '<div class="accordion-body">' +
+            '<div class="row g-3">' + itemsHtml + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+  document.getElementById('projectAccordion').innerHTML = projAccHtml;
+
+  const tabs = document.querySelectorAll('#mrTabs .nav-link');
+  const panes = document.querySelectorAll('.mr-pane');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+      const key = tab.getAttribute('data-tab');
+      panes.forEach(function(p){
+        p.classList.toggle('d-none', p.getAttribute('data-pane') !== key);
+      });
+    });
+  });
+
+  const verdicts = [
+    { text: 'PASS', cls: 'bg-success-subtle text-success', icon: 'mdi-check-circle' },
+    { text: 'PASS', cls: 'bg-success-subtle text-success', icon: 'mdi-check-circle' },
+    { text: 'FAIL', cls: 'bg-danger-subtle text-danger', icon: 'mdi-close-circle' }
+  ];
+  let vi = 0;
+  const badge = document.getElementById('verdictBadge');
+  function cycleVerdict(){
+    const v = verdicts[vi % verdicts.length];
+    badge.className = 'badge fs-4 px-3 py-2 ' + v.cls;
+    badge.innerHTML = '<i class="mdi ' + v.icon + ' me-1"></i>' + v.text;
+    vi++;
+  }
+  cycleVerdict();
+  setInterval(cycleVerdict, 2400);
+})();
+</script>
+<script>
+
+function applyBrightness(value) {
+
+    let img = document.getElementById("brightness-img");
+
+    img.style.filter =
+        "brightness(" + (100 + Number(value)) + "%)";
+}
+
+
+
+function applyContrast(value) {
+
+    let img = document.getElementById("contrast-img");
+
+    img.style.filter =
+        "contrast(" + value + "%)";
+}
+
+
+
+function applyBlur(value) {
+
+    let img = document.getElementById("blur-img");
+
+    img.style.filter =
+        "blur(" + value + "px)";
+}
+
+
+
+function applyNoise(value) {
+
+    let img = document.getElementById("noise-img");
+
+    /*
+       Simulating sensor noise.
+       CSS cannot create real noise,
+       so we simulate degradation.
+    */
+
+    img.style.filter =
+        "contrast(" + (100 + Number(value)) + "%) " +
+        "brightness(" + (100 - Number(value)/3) + "%)";
+}
+
+
+
+
+function applyRotation(value) {
+
+    let img = document.getElementById("rotation-img");
+
+    img.style.transform =
+        "rotate(" + value + "deg)";
+}
+
+
+
+
+function applyTranslation(value) {
+
+    let img = document.getElementById("translation-img");
+
+    img.style.transform =
+        "translateX(" + value + "px)";
+}
+
+
+
+
+function applyComposite(value) {
+
+    let img = document.getElementById("composite-img");
+
+
+    img.style.filter =
+        "brightness(" + (100-value) + "%) " +
+        "contrast(" + (100+value) + "%) " +
+        "blur(" + (value/10) + "px)";
+
+}
+
+
+
+
+function applyFlip(value) {
+
+    let img = document.getElementById("flip-img");
+
+
+    if(value == 1)
+    {
+        img.style.transform = "scaleX(-1)";
+    }
+    else
+    {
+        img.style.transform = "scaleX(1)";
+    }
+
+}
+// Unified Particle System
+function createParticleSystem(canvasId, type) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let intensity = 8;
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = (type === 'rain' || type === 'snow') ? Math.random() * canvas.height * 0.4 - 30 : Math.random() * canvas.height;
+            this.size = Math.random() * 4 + 1.5;
+            this.opacity = Math.random() * 0.7 + 0.3;
+            this.wobble = Math.random() * Math.PI * 2;
+
+            if (type === 'rain' || type === 'snow') {
+                this.speedX = (Math.random() - 0.5) * 1.8;
+                this.speedY = type === 'rain' ? 12 : 4;
+            } else {
+                this.speedX = (Math.random() - 0.5) * 2.5;
+                this.speedY = (Math.random() - 0.5) * 2.5;
+            }
+        }
+        update() {
+            this.wobble += 0.06;
+            if (type === 'rain' || type === 'snow') {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedX += Math.sin(this.wobble) * 0.12;
+            } else {
+                this.speedX += Math.sin(this.wobble) * 0.13;
+                this.speedY += Math.cos(this.wobble) * 0.10;
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+
+            if (type === 'rain' || type === 'snow') {
+                if (this.y > canvas.height) this.reset();
+            } else {
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+        }
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = this.opacity;
+            if (type === 'rain') {
+                ctx.strokeStyle = '#a0d8ff';
+                ctx.lineWidth = this.size * 0.9;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.speedX * 1.8, this.y + 24);
+                ctx.stroke();
+            } else if (type === 'snow') {
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (type === 'dust') {
+                ctx.fillStyle = '#d2b48c';
+                ctx.fillRect(this.x, this.y, this.size * 2.8, this.size * 1.6);
+            } else if (type === 'smoke') {
+                ctx.fillStyle = '#666666';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 4.8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const count = Math.floor(intensity);
+        for (let i = 0; i < count; i++) {
+            if (!particles[i]) particles[i] = new Particle();
+            particles[i].update();
+            particles[i].draw();
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    return function setIntensity(val) {
+        intensity = Math.max(5, Math.floor(val / (type === 'rain' || type === 'snow' ? 3.2 : 3.8)));
+    };
+}
+
+// Initialize systems
+const rainSystem  = createParticleSystem('rain-canvas', 'rain');
+const snowSystem  = createParticleSystem('snow-canvas', 'snow');
+const dustSystem  = createParticleSystem('dust-canvas', 'dust');
+const smokeSystem = createParticleSystem('smoke-canvas', 'smoke');
+
+// Apply functions
+function applyRain(value)  { rainSystem(value); }
+function applySnow(value)  { snowSystem(value); }
+function applyDust(value)  { dustSystem(value); }
+function applySmoke(value) { smokeSystem(value); }
+
+function applyFog(value) {
+    const img = document.getElementById('fog-img');
+    img.style.filter = `blur(${value/22}px) brightness(${95 - value/4}%)`;
+}
+
+function applyHaze(value) {
+    const img = document.getElementById('haze-img');
+    const i = value / 100;
+    img.style.filter = `contrast(75%) brightness(82%) sepia(15%)`;
+    img.style.opacity = 1 - i * 0.65;
+}
+
+function applyDark(value) {
+    const img = document.getElementById('dark-img');
+    img.style.filter = `brightness(${100 - value}%) contrast(125%)`;
+}
+
+// Initialize effects at page load
+window.addEventListener('load', () => {
+    applyRain(5);
+    applySnow(5);
+    applyDust(5);
+    applySmoke(5);
+    applyFog(30);
+    applyHaze(30);
+    applyDark(30);
+});
+// Temporal Smoothness
+function applySmoothness(value) {
+    document.getElementById('smooth-val').textContent = value + '%';
+    const angle = (value / 100 * 8 - 4).toFixed(1); // -4° to +4° smooth change
+    document.getElementById('smooth-value').textContent = angle + '°';
+}
+
+// Temporal Consistency
+function applyConsistency(value) {
+    document.getElementById('consist-val').textContent = value + '%';
+    const base = 1.8;
+    const noise = (value / 100) * 0.6;
+    document.getElementById('consist-t').textContent = (base).toFixed(1) + '°';
+    document.getElementById('consist-t1').textContent = (base + noise).toFixed(1) + '°';
+}
+
+// Monotonic Increase
+function applyMonotonicIncrease(value) {
+    document.getElementById('inc-val').textContent = value + '%';
+    const angle = (2.5 + value / 25).toFixed(1);
+    document.getElementById('inc-value').textContent = '+' + angle + '°';
+}
+
+// Monotonic Decrease
+function applyMonotonicDecrease(value) {
+    document.getElementById('dec-val').textContent = value + '%';
+    const speed = (48 - value / 8).toFixed(1);
+    document.getElementById('dec-value').textContent = speed + ' km/h';
+}
+
+// Bounded Inequality with simple chart
+let boundCtx;
+function initBoundChart() {
+    const canvas = document.getElementById('bound-canvas');
+    boundCtx = canvas.getContext('2d');
+}
+
+function applyBounded(value) {
+    document.getElementById('bound-val').textContent = value + '%';
+    const change = (value / 100 * 12).toFixed(1);
+    document.getElementById('bound-change').textContent = '±' + change + '°';
+
+    // Simple animated bar
+    if (boundCtx) {
+        boundCtx.clearRect(0, 0, 260, 140);
+        // Background grid
+        boundCtx.strokeStyle = '#eee';
+        for (let i = 20; i < 260; i += 40) boundCtx.moveTo(i, 10), boundCtx.lineTo(i, 130);
+        boundCtx.stroke();
+        
+        // Bar
+        const height = Math.min(110, value * 1.1);
+        boundCtx.fillStyle = value < 70 ? '#28a745' : '#ffc107';
+        boundCtx.fillRect(50, 130 - height, 160, height);
+        
+        boundCtx.fillStyle = '#333';
+        boundCtx.font = '14px Arial';
+        boundCtx.fillText('Prediction Change', 70, 25);
+    }
+}
+
+// Initialize on load
+window.addEventListener('load', () => {
+    initBoundChart();
+    applyBounded(0); // initial draw
+});
+</script>
+<style>
+
+.concept-card {
+    border: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.concept-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+}
+.concept-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+}
+.bg-soft-primary   { background-color: rgba(114,124,245,.15); }
+.bg-soft-secondary { background-color: rgba(108,117,125,.15); }
+.bg-soft-success   { background-color: rgba(10,207,151,.15); }
+.bg-soft-info      { background-color: rgba(57,175,209,.15); }
+.bg-soft-warning   { background-color: rgba(255,188,0,.15); }
+.bg-soft-danger    { background-color: rgba(250,92,124,.15); }
+ 
+.concept-badge {
+    font-size: 12px; font-weight: 700; letter-spacing: .5px;
+    padding: 3px 7px; border-radius: 4px; opacity: .85;
+}
+.header-title {
+    font-family: inherit;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+.concept-text {
+    font-size: 16px;
+    line-height: 1.6;
+}
+.concept-details summary {
+    font-size: 15px;
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.concept-details summary::-webkit-details-marker { display: none; }
+.concept-details summary::before {
+    content: "\F0142"; /* mdi chevron-right */
+    font-family: "Material Design Icons";
+    margin-right: 4px;
+    transition: transform .15s ease;
+    font-size: 16px;
+}
+.concept-details[open] summary::before { transform: rotate(90deg); }
+.concept-details p {
+    font-size: 15px;
+    line-height: 1.55;
+}
+ 
+.concept-stage {
+    position: relative;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: repeating-linear-gradient(135deg, #fafbfe, #fafbfe 10px, #f2f4fa 10px, #f2f4fa 20px);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+ 
+/* 1. Oracle Problem */
+.oracle-king { position:absolute; left:12px; top:16px; font-size:26px; }
+.oracle-farmer { position:absolute; right:12px; top:16px; font-size:26px; animation: nod 2s ease-in-out infinite; }
+.oracle-machine { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); font-size:24px; animation: glow 1.6s ease-in-out infinite; }
+.oracle-bubble {
+    position:absolute; top:6px; left:50%; transform:translateX(-50%);
+    background:#727cf5; color:#fff; font-weight:700; width:24px; height:24px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+    animation: bubblePulse 1.4s ease-in-out infinite;
+}
+@keyframes nod { 0%,100%{ transform: rotate(0deg);} 50%{ transform: rotate(-8deg);} }
+@keyframes glow { 0%,100%{ filter: drop-shadow(0 0 2px #727cf5);} 50%{ filter: drop-shadow(0 0 9px #727cf5);} }
+@keyframes bubblePulse { 0%,100%{ opacity:.4; transform:translateX(-50%) scale(0.9);} 50%{ opacity:1; transform:translateX(-50%) scale(1.15);} }
+ 
+/* 2. Black-box Testing */
+.bb-box {
+    width:62px; height:62px; border:2px dashed #6c757d; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; position:relative;
+    animation: bbShake 3s ease-in-out infinite; background:#fff;
+}
+.bb-gear { font-size:20px; animation: spin 3s linear infinite; position:absolute; }
+.bb-gear2 { font-size:12px; top:6px; right:4px; animation: spin 2s linear infinite reverse; }
+.bb-arrow-in, .bb-arrow-out { font-size:11px; font-weight:700; color:#6c757d; margin:0 8px; text-transform:uppercase; letter-spacing:.5px; }
+@keyframes spin { from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
+@keyframes bbShake { 0%,90%,100%{ transform: translateX(0);} 92%{ transform: translateX(-2px);} 94%{ transform: translateX(2px);} 96%{ transform: translateX(-2px);} }
+ 
+/* 3. Metamorphic Relations */
+.mr-pizza { position:relative; width:80px; height:80px; }
+.mr-base { position:absolute; inset:0; border-radius:50%; background:#f1c27d; border:4px solid #d9a441; }
+.mr-cheese {
+    position:absolute; left:10%; top:10%; width:80%; height:80%; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, #ffe89b, #ffbc00 70%);
+    transform: scale(0.55); animation: cheeseGrow 2.2s ease-in-out infinite;
+}
+@keyframes cheeseGrow {
+    0%, 15% { transform: scale(0.55); }
+    50%, 65% { transform: scale(0.9); }
+    100% { transform: scale(0.55); }
+}
+ 
+/* 4. Robustness Testing */
+.robust-road { position:absolute; bottom:14px; left:0; right:0; height:4px; background:#adb5bd; }
+.robust-car {
+    position:absolute; bottom:16px; left:-30px; font-size:24px;
+    animation: driveAcross 8s linear infinite;
+    transform: scaleX(-1);
+}
+@keyframes driveAcross {
+    0%   { left:-30px; }
+    100% { left:110%; }
+}
+.rain-drop { position:absolute; top:-10px; width:2px; height:12px; background:#39afd1; opacity:.8; animation: fall 1.6s linear infinite; }
+.rain-drop.d1 { left:20%; animation-delay:0s; }
+.rain-drop.d2 { left:45%; animation-delay:.4s; }
+.rain-drop.d3 { left:65%; animation-delay:.2s; }
+.rain-drop.d4 { left:85%; animation-delay:.6s; }
+@keyframes fall { 0% { top:-10px; opacity:.9; } 100% { top:110px; opacity:0; } }
+ 
+/* 5. Temporal Consistency */
+.clock-face { width:54px; height:54px; border-radius:50%; border:3px solid #0acf97; position:relative; background:#fff; }
+.clock-hand { position:absolute; width:2px; height:20px; background:#0acf97; left:50%; bottom:50%; transform-origin:bottom center; animation: tick 4s steps(12) infinite; }
+@keyframes tick { from{ transform: rotate(0deg);} to{ transform: rotate(360deg);} }
+.temporal-bubble {
+    position:absolute; right:8px; bottom:10px; background:#fff; border:1px solid #dee2e6;
+    border-radius:6px; padding:3px 6px; font-size:10px; font-weight:600; color:#495057;
+    animation: bubbleCycle 4.5s ease-in-out infinite;
+}
+@keyframes bubbleCycle {
+    0%, 28% { opacity:1; transform: translateY(0); }
+    33%, 100% { opacity:0; transform: translateY(-6px); }
+}
+ 
+/* 6. Model-Agnostic */
+.mech-wrench { position:absolute; top:8px; left:50%; transform:translateX(-50%); font-size:22px; animation: wrenchTurn 1.8s ease-in-out infinite; }
+@keyframes wrenchTurn { 0%,100%{ transform: translateX(-50%) rotate(-15deg);} 50%{ transform: translateX(-50%) rotate(15deg);} }
+.mech-car { position:absolute; bottom:12px; font-size:20px; opacity:0.25; animation: carCheck 4.5s ease-in-out infinite; }
+.mc1 { left:14%; animation-delay:0s; }
+.mc2 { left:44%; animation-delay:1.5s; }
+.mc3 { left:74%; animation-delay:3s; }
+@keyframes carCheck {
+    0%, 8% { opacity:0.25; transform: scale(1); }
+    16%, 24% { opacity:1; transform: scale(1.25); }
+    32%, 100% { opacity:0.25; transform: scale(1); }
+}
+</style>
+<script>
+document.getElementById("btn-toggle-guide").addEventListener("click", function () {
+    const guide = document.getElementById("concept-guide");
+    const hidden = guide.classList.toggle("d-none");
+    this.innerHTML = hidden
+        ? '<i class="mdi mdi-school-outline me-1"></i> What do these testing terms mean?'
+        : '<i class="mdi mdi-close me-1"></i> Hide concept guide';
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,810 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Run #{{ run.pk }}{% endblock %}
+{% block page_title %}AutoMR · Run #{{ run.pk }}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'vendor/ubold/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet" type="text/css" />
+<style>
+    /* Long generated-file paths (with backslashes) must wrap instead of
+       forcing the whole page to scroll horizontally. */
+    .text-break code { word-break: break-all; white-space: normal; }
+    .apexcharts-canvas { max-width: 100%; }
+    #filePreviewTarget img { max-width: 100%; height: auto; }
+
+    /* Transformation-sample thumbnail borders */
+    .original-border { border: 3px solid #727cf5; }
+    .normal-border { border: 1px solid #dee2e6; }
+
+    /* Wraps ALL relations in the Sweep / Indexed tab into one bounded,
+       scrollable panel instead of letting the page grow indefinitely */
+    .ts-panel {
+        max-height: 700px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 6px; /* room for scrollbar so it doesn't sit on thumbnails */
+    }
+    .ts-panel::-webkit-scrollbar {
+        width: 10px;
+    }
+    .ts-panel::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    .ts-panel::-webkit-scrollbar-thumb {
+        background: #adb5bd;
+        border-radius: 4px;
+    }
+    .ts-panel::-webkit-scrollbar-thumb:hover {
+        background: #868e96;
+    }
+
+    /* Each relation's row of thumbnails — plain flex-wrap is fine here,
+       since the outer .ts-panel is what scrolls, not this row */
+    .thumb-row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row" width="100%">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+            <h4 class="page-title">Run #{{ run.pk }} — {{ run.model.name }} on {{ run.dataset.name }}</h4>
+            <a href="{% url 'robustness:testrun_list' %}" class="btn btn-sm btn-light"><i class="mdi mdi-arrow-left"></i> All runs</a>
+        </div>
+    </div>
+</div>
+
+{% if run.status == 'pending' or run.status == 'running' %}
+<div class="alert alert-warning">This run is still {{ run.status }}. Refresh in a moment.</div>
+{% endif %}
+
+{% if run.status == 'failed' %}
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title text-danger mb-3">AutoMR run failed</h4>
+        <div class="alert alert-danger">{{ run.error_message }}</div>
+        {% if run.traceback_text %}
+        <details class="mb-3">
+            <summary class="mb-2">Traceback</summary>
+            <pre class="bg-light p-3 rounded small">{{ run.traceback_text }}</pre>
+        </details>
+        {% endif %}
+        {% if run.console_log %}
+        <details>
+            <summary class="mb-2">Captured console output</summary>
+            <pre class="bg-light p-3 rounded small">{{ run.console_log }}</pre>
+        </details>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if run.status == 'success' %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card widget-flat">
+            <div class="card-body">
+                <h5 class="text-muted fw-normal mt-0" title="Dataset size">Dataset size</h5>
+                <h3 class="mt-3 mb-3">{{ run.dataset_size|default:"—" }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card widget-flat">
+            <div class="card-body">
+                <h5 class="text-muted fw-normal mt-0">Runtime</h5>
+                <h3 class="mt-3 mb-3">{{ run.runtime_seconds|floatformat:2 }} sec</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Registered Transformations</h5>
+                <p class="mb-0">{{ run.transforms|join:", " }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Registered Relations</h5>
+                <p class="mb-0">{{ run.relations|join:", " }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title mb-3">Generated report files</h4>
+        <p class="text-muted small">Click <i class="mdi mdi-eye-outline"></i> to preview any file in the browser — charts for CSVs, text for logs/JSON, and inline images.</p>
+
+        <ul class="nav nav-pills navtab-bg nav-justified">
+            <li class="nav-item">
+                <a href="#files_tab_summary" data-bs-toggle="tab" aria-expanded="true" class="nav-link active">
+                    Top-level summary
+                </a>
+            </li>
+            {% if file_groups.epsilon_tabs %}
+            <li class="nav-item">
+                <a href="#files_tab_epsilon" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                    Epsilon sweep
+                </a>
+            </li>
+            {% endif %}
+            {% if file_groups.transformation_meta %}
+            <li class="nav-item">
+                <a href="#files_tab_ts" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                    Transformation samples
+                </a>
+            </li>
+            {% endif %}
+            {% if file_groups.other %}
+            <li class="nav-item">
+                <a href="#files_tab_other" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                    Other
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane show active" id="files_tab_summary">
+                {% include "robustness/_file_cards.html" with files=file_groups.summary %}
+            </div>
+
+            {% if file_groups.epsilon_tabs %}
+            <div class="tab-pane" id="files_tab_epsilon">
+                {% for grp in file_groups.epsilon_tabs %}
+                <h6 class="mt-3">{{ grp.label }}</h6>
+                {% include "robustness/_file_cards.html" with files=grp.files %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if file_groups.transformation_meta %}
+            <div class="tab-pane" id="files_tab_ts">
+                <p class="text-muted small">Per-image files are shown as thumbnails above — this tab only has the metadata/summary CSVs.</p>
+                {% include "robustness/_file_cards.html" with files=file_groups.transformation_meta %}
+            </div>
+            {% endif %}
+
+            {% if file_groups.other %}
+            <div class="tab-pane" id="files_tab_other">
+                {% include "robustness/_file_cards.html" with files=file_groups.other %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===== Transformation samples (single card, Sweep + Indexed tabs) ===== -->
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title mb-1">Transformation samples</h4>
+        <p class="text-muted small">
+            <strong>Sweep</strong>: one photo tested at increasing strength.
+            <strong>Indexed samples</strong>: many different dataset photos, each with its own original + transform(s).
+        </p>
+
+        {% if ts_metadata_rows %}
+        <details class="mb-3">
+            <summary class="text-muted small">Show metadata table</summary>
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-centered mb-0">
+                    <thead><tr>{% for k in ts_metadata_rows.0.keys %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+                    <tbody>{% for row in ts_metadata_rows %}<tr>{% for v in row.values %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+                </table>
+            </div>
+        </details>
+        {% endif %}
+
+        <ul class="nav nav-pills navtab-bg nav-justified">
+            <li class="nav-item">
+                <a href="#ts_tab_sweep" data-bs-toggle="tab" aria-expanded="true" class="nav-link active">
+                    Sweep
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#ts_tab_indexed" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                    Indexed samples
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- ===== SWEEP TAB ===== -->
+            <div class="tab-pane show active" id="ts_tab_sweep">
+                {% if transformation_samples_sweep %}
+                <div class="ts-panel">
+                    {% for mr, imgs in transformation_samples_sweep.items %}
+                    <h6 class="mt-3">{{ mr }}</h6>
+                    <div class="thumb-row pb-2" style="gap: 12px;">
+                        {% for img in imgs %}
+                        <div class="text-center flex-shrink-0" style="width: 220px;">
+                            <img src="{{ img.url }}"
+                                 class="img-fluid rounded {% if img.role == 'original' %}original-border{% else %}normal-border{% endif %}"
+                                 alt="{{ img.name }}"
+                                 style="width:220px;height:220px;object-fit:cover;">
+                            <div class="small mt-1">
+                                {% if img.role == 'original' %}
+                                <span class="badge bg-primary">Original</span>
+                                {% else %}
+                                <span class="text-muted">param = {{ img.param|floatformat:2 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0 mt-3">No single-photo sweep samples found.</p>
+                {% endif %}
+            </div>
+
+            <!-- ===== INDEXED TAB ===== -->
+            <div class="tab-pane" id="ts_tab_indexed">
+                {% if transformation_samples_indexed %}
+                <div class="ts-panel">
+                    {% for mr, groups in transformation_samples_indexed.items %}
+                    <h6 class="mt-3">{{ mr }}</h6>
+                    {% for grp in groups %}
+                    <p class="text-muted small mb-1">Sample #{{ grp.idx }}</p>
+                    <div class="thumb-row pb-2 mb-3" style="gap: 12px;">
+                        {% for img in grp.entries %}
+                        <div class="text-center flex-shrink-0" style="width: 180px;">
+                            <img src="{{ img.url }}"
+                                 class="img-fluid rounded {% if img.role == 'original' %}original-border{% else %}normal-border{% endif %}"
+                                 alt="{{ img.name }}"
+                                 style="width:180px;height:180px;object-fit:cover;">
+                            <div class="small mt-1">
+                                {% if img.role == 'original' %}
+                                <span class="badge bg-primary">Original</span>
+                                {% else %}
+                                <span class="text-muted">param = {{ img.param|floatformat:2 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0 mt-3">No indexed samples found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title mb-3">Epsilon Analysis</h4>
+        {% if eps_rep %}
+        <div class="row mb-3">
+            <div class="col-md-3"><h6 class="text-muted">First Failure ε</h6><h4>{{ eps_first_failure|default:"—" }}</h4></div>
+            <div class="col-md-3"><h6 class="text-muted">Recommended ε</h6><h4>{{ eps_recommended|default:"—" }}</h4></div>
+            <div class="col-md-3"><h6 class="text-muted">Stabilization ε</h6><h4>{{ eps_stabilization|default:"—" }}</h4></div>
+            <div class="col-md-3"><h6 class="text-muted">Max Failure Rate</h6><h4>{{ eps_max_failure_rate|default:"—" }}</h4></div>
+        </div>
+        <details>
+            <summary class="mb-2">Full epsilon report</summary>
+            <pre class="bg-light p-3 rounded small mt-2">{{ eps_rep }}</pre>
+        </details>
+        {% else %}
+        <p class="text-muted mb-0">No epsilon_report found in results or output_dir.</p>
+        {% endif %}
+
+        {% if eps_chart %}
+        <div class="mt-3">
+            <h6>Failure rate vs epsilon</h6>
+            <div id="eps-chart" data-labels="{{ eps_chart.labels|join:',' }}" data-values="{{ eps_chart.values|join:',' }}"></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title mb-3">AutoMR Results failure rate per relation</h4>
+        {% if fail_chart %}
+        <div id="fail-chart" data-labels="{{ fail_chart.labels|join:',' }}" data-values="{{ fail_chart.values|join:',' }}"></div>
+        {% endif %}
+        {% if fail_summary_rows %}
+        <details class="mt-3">
+            <summary class="text-muted small">Show table</summary>
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-centered mb-0">
+                    <thead><tr>{% for k in fail_summary_rows.0.keys %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for row in fail_summary_rows %}
+                        <tr>{% for v in row.values %}<td>{{ v }}</td>{% endfor %}</tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+        {% else %}
+        <p class="text-muted mb-0">failure_summary not found.</p>
+        {% endif %}
+
+        <h5 class="mt-4 mb-2">Severity per relation</h5>
+        {% if sev_chart %}
+        <div id="sev-chart" data-labels="{{ sev_chart.labels|join:',' }}" data-values="{{ sev_chart.values|join:',' }}"></div>
+        {% endif %}
+        {% if sev_summary_rows %}
+        <details class="mt-3">
+            <summary class="text-muted small">Show table</summary>
+            <div class="table-responsive mt-2">
+                <table class="table table-sm table-centered mb-0">
+                    <thead><tr>{% for k in sev_summary_rows.0.keys %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for row in sev_summary_rows %}
+                        <tr>{% for v in row.values %}<td>{{ v }}</td>{% endfor %}</tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+        {% else %}
+        <p class="text-muted mb-0">severity_summary not found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-3">Worst-case samples</h4>
+                {% if worst_chart %}
+                <div id="worst-chart" data-labels="{{ worst_chart.labels|join:',' }}" data-values="{{ worst_chart.values|join:',' }}"></div>
+                {% endif %}
+                {% if worst_cases_rows %}
+                <details class="mt-3">
+                    <summary class="text-muted small">Show table</summary>
+                    <div class="table-responsive mt-2">
+                        <table class="table table-sm table-centered mb-0">
+                            <thead><tr>{% for c in worst_cases_cols %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+                            <tbody>
+                                {% for row in worst_cases_rows %}
+                                <tr>{% for v in row.values %}<td>{{ v }}</td>{% endfor %}</tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+                {% else %}
+                <p class="text-muted mb-0">worst_cases not found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title mb-3">Failure-prone parameter regions</h4>
+        {% if regions %}
+        {% for mr, ranges in regions.items %}
+        <p class="mb-1"><strong>{{ mr }}</strong> → {{ ranges }}</p>
+        {% endfor %}
+        {% elif regions_text %}
+        <pre class="bg-light p-3 rounded small">{{ regions_text }}</pre>
+        {% else %}
+        <p class="text-muted mb-0">No failure regions detected / found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Range summary</h5>
+                {% if range_chart %}
+                <div id="range-chart" data-labels="{{ range_chart.labels|join:',' }}" data-values="{{ range_chart.values|join:',' }}"></div>
+                {% endif %}
+                {% if range_summary_rows %}
+                <details class="mt-3">
+                    <summary class="text-muted small">Show table</summary>
+                    <div class="table-responsive mt-2">
+                        <table class="table table-sm table-centered mb-0">
+                            <thead><tr>{% for k in range_summary_rows.0.keys %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+                            <tbody>{% for row in range_summary_rows %}<tr>{% for v in row.values %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                </details>
+                {% else %}
+                <p class="text-muted mb-0">not found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="header-title mb-2">Range analysis</h5>
+                {% if range_analysis_rows %}
+                <details class="mt-3">
+                    <summary class="text-muted small">Show table</summary>
+                    <div class="table-responsive mt-2">
+                        <table class="table table-sm table-centered mb-0">
+                            <thead><tr>{% for k in range_analysis_rows.0.keys %}<th>{{ k }}</th>{% endfor %}</tr></thead>
+                            <tbody>{% for row in range_analysis_rows %}<tr>{% for v in row.values %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                </details>
+                {% else %}
+                <p class="text-muted mb-0">not found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title mb-3">Full prediction trace</h4>
+
+        {% if pred_trace is not None and not pred_trace.empty %}
+        <p class="text-muted small">
+            Showing {{ pred_trace|length }} of {{ pred_trace_total|default:0 }} rows
+            (Page {{ pred_trace_page }})
+        </p>
+
+        <nav class="mb-3">
+            <ul class="pagination pagination-sm">
+                {% if pred_trace_page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pred_trace_page|add:"-1" }}">← Previous</a>
+                </li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ pred_trace_page }}</span></li>
+                {% if has_next_page %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pred_trace_page|add:"1" }}">Next →</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-bordered">
+                <thead>
+                    <tr>
+                        {% for col in pred_trace.columns %}<th>{{ col }}</th>{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, row in pred_trace.iterrows %}
+                    <tr>
+                        {% for value in row %}<td>{{ value }}</td>{% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No prediction trace available.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>baseline_metrics.json</h6>
+                {% if baseline_metrics %}
+                <pre class="bg-light p-3 rounded small">{{ baseline_metrics }}</pre>
+                {% else %}<p class="text-muted small mb-0">not found</p>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>model_summary.txt</h6>
+                {% if model_summary_text %}
+                <pre class="bg-light p-3 rounded small">{{ model_summary_text }}</pre>
+                {% else %}<p class="text-muted small mb-0">not found</p>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>dataset_info.json</h6>
+                {% if dataset_info %}
+                <pre class="bg-light p-3 rounded small">{{ dataset_info }}</pre>
+                {% else %}<p class="text-muted small mb-0">not found</p>{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if has_csv %}
+<div class="mb-3">
+    <a href="{% url 'robustness:testrun_download_file' run.pk 'automr_results.csv' %}" class="btn btn-outline-primary">
+        <i class="mdi mdi-download"></i> Download automr_results.csv
+    </a>
+</div>
+{% endif %}
+
+<!-- Generic file preview modal (CSV chart / text / image) -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable" style="max-width: 95vw;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filePreviewModalLabel">Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="filePreviewCsvControls" class="mb-2 d-none">
+                    <label class="form-label mb-1 d-block">Y column(s):</label>
+                    <div id="csvChartColumnCheckboxes" class="d-flex flex-wrap gap-3"></div>
+                </div>
+                <div id="filePreviewTarget"></div>
+                <div id="filePreviewError" class="text-danger small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if run.status == 'success' %}
+<script src="{% static 'vendor/ubold/assets/libs/apexcharts/apexcharts.min.js' %}"></script>
+<script src="{% static 'vendor/ubold/assets/libs/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/ubold/assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+
+function renderBarChart(elId, chartType) {
+    var el = document.querySelector(elId);
+    if (!el) return;
+    var labels = el.dataset.labels.split(',');
+    var values = el.dataset.values.split(',').map(Number);
+    new ApexCharts(el, {
+        chart: { type: chartType || 'bar', height: 260, toolbar: { show: false } },
+        series: [{ name: 'value', data: values }],
+        xaxis: { categories: labels },
+        colors: ['#727cf5'],
+        dataLabels: { enabled: false },
+    }).render();
+}
+renderBarChart('#fail-chart', 'bar');
+renderBarChart('#sev-chart', 'bar');
+renderBarChart('#eps-chart', 'line');
+renderBarChart('#range-chart', 'bar');
+renderBarChart('#worst-chart', 'bar');
+renderBarChart('#pred-trace-chart', 'bar');
+
+$(document).ready(function () {
+    if ($('#pred-trace-table').length) {
+        $('#pred-trace-table').DataTable({ pageLength: 10, scrollX: true });
+    }
+});
+
+var LARGE_CSV_THRESHOLD = 20 * 1024 * 1024; // 20MB
+
+// ---- Generic "preview any generated file" modal (event-delegated so
+// hundreds of file rows attach zero per-row listeners on page load) ----
+(function () {
+    var modalEl = document.getElementById('filePreviewModal');
+    if (!modalEl) return;
+    var modal = new bootstrap.Modal(modalEl);
+    var target = document.getElementById('filePreviewTarget');
+    var csvControls = document.getElementById('filePreviewCsvControls');
+    var columnCheckboxes = document.getElementById('csvChartColumnCheckboxes');
+    var errorBox = document.getElementById('filePreviewError');
+    var currentChart = null;
+    var currentRows = null;
+    var currentLabelCol = null;
+    var MAX_ROWS = 300;
+
+    function isNumeric(v) {
+        return v !== null && v !== '' && !isNaN(v);
+    }
+
+    function resetModal() {
+        errorBox.textContent = '';
+        target.innerHTML = '<p class="text-muted small">Loading…</p>';
+        csvControls.classList.add('d-none');
+        columnCheckboxes.innerHTML = '';
+        if (currentChart) { currentChart.destroy(); currentChart = null; }
+    }
+
+    function drawCsvChart(numericCols) {
+        target.innerHTML = '';
+        if (currentChart) { currentChart.destroy(); currentChart = null; }
+        if (!numericCols.length) return;
+        var rows = currentRows.slice(0, MAX_ROWS);
+        var labels = rows.map(function (r) { return currentLabelCol ? String(r[currentLabelCol]) : ''; });
+        var series = numericCols.map(function (col) {
+            return { name: col, data: rows.map(function (r) { return Number(r[col]); }) };
+        });
+        currentChart = new ApexCharts(target, {
+            chart: { type: series.length > 1 ? 'line' : 'bar', height: Math.round(window.innerHeight * 0.5), toolbar: { show: true } },
+            series: series,
+            xaxis: { categories: labels, labels: { rotate: -45 } },
+            stroke: { width: 2 },
+        });
+        currentChart.render();
+    }
+
+    function previewCsv(url) {
+        fetch(url).then(function (r) {
+            if (!r.ok) throw new Error('Could not fetch file (' + r.status + ')');
+            return r.text();
+        }).then(function (text) {
+            var parsed = Papa.parse(text, { header: true, dynamicTyping: true, skipEmptyLines: true });
+            var rows = parsed.data;
+            if (!rows.length) throw new Error('CSV has no data rows.');
+            var cols = parsed.meta.fields || Object.keys(rows[0]);
+
+            var numericCols = cols.filter(function (c) {
+                return rows.slice(0, 20).every(function (r) { return isNumeric(r[c]); });
+            });
+            var labelCol = cols.find(function (c) { return numericCols.indexOf(c) === -1; }) || null;
+
+            currentRows = rows;
+            currentLabelCol = labelCol;
+
+            if (!numericCols.length) {
+                target.innerHTML = '';
+                errorBox.textContent = 'No numeric columns found to chart in this CSV.';
+                return;
+            }
+
+            csvControls.classList.remove('d-none');
+            columnCheckboxes.innerHTML = numericCols.map(function (c, i) {
+                var id = 'csv-col-' + i;
+                var checked = i < 5 ? 'checked' : '';
+                return '<div class="form-check">' +
+                    '<input class="form-check-input csv-col-checkbox" type="checkbox" value="' + c + '" id="' + id + '" ' + checked + '>' +
+                    '<label class="form-check-label" for="' + id + '">' + c + '</label>' +
+                    '</div>';
+            }).join('');
+
+            drawCsvChart(numericCols.slice(0, 5));
+        }).catch(function (e) {
+            target.innerHTML = '';
+            errorBox.textContent = e.message || String(e);
+        });
+    }
+
+    function previewLargeCsv(chartUrl) {
+        csvControls.classList.add('d-none');
+
+        var elapsed = 0;
+        target.innerHTML = '<p class="text-muted small" id="chart-loading-msg">File is too large to load in-browser — computing an aggregated chart on the server, set by set… (0s)</p>';
+        var ticker = setInterval(function () {
+            elapsed += 1;
+            var msg = document.getElementById('chart-loading-msg');
+            if (msg) msg.textContent = 'File is too large to load in-browser — computing an aggregated chart on the server, set by set… (' + elapsed + 's)';
+        }, 1000);
+
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function () { controller.abort(); }, 120000);
+
+        fetch(chartUrl, { signal: controller.signal }).then(function (r) {
+            clearTimeout(timeoutId);
+            clearInterval(ticker);
+            if (!r.ok) throw new Error('Could not fetch chart data (' + r.status + ')');
+            return r.json();
+        }).then(function (data) {
+            if (data.error) throw new Error(data.error);
+            if (!data.rows.length) throw new Error('No numeric data found to chart.');
+
+            var labels = data.rows.map(function (r) { return r.x; });
+            var series = data.columns.map(function (col) {
+                return { name: col, data: data.rows.map(function (r) { return r[col]; }) };
+            });
+
+            target.innerHTML = '';
+            currentChart = new ApexCharts(target, {
+                chart: { type: series.length > 1 ? 'line' : 'bar', height: Math.round(window.innerHeight * 0.5), toolbar: { show: true } },
+                series: series,
+                xaxis: { categories: labels, labels: { rotate: -45 } },
+                stroke: { width: 2 },
+            });
+            currentChart.render();
+
+            var note = document.createElement('p');
+            note.className = 'text-muted small mt-2 mb-0';
+            note.textContent = 'Aggregated view: ' + data.rows.length + ' points summarized from '
+                + data.total_rows_seen.toLocaleString() + ' rows.';
+            target.appendChild(note);
+        }).catch(function (e) {
+            clearTimeout(timeoutId);
+            clearInterval(ticker);
+            target.innerHTML = '';
+            if (e.name === 'AbortError') {
+                errorBox.textContent = 'Still computing after 2 minutes — this file is being aggregated server-side. It gets cached after the first successful scan, so try reopening this preview shortly.';
+            } else {
+                errorBox.textContent = e.message || String(e);
+            }
+        });
+    }
+
+    function previewText(url) {
+        fetch(url).then(function (r) {
+            if (!r.ok) throw new Error('Could not fetch file (' + r.status + ')');
+            return r.text();
+        }).then(function (text) {
+            var pre = document.createElement('pre');
+            pre.className = 'bg-light p-3 rounded small mb-0';
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.style.wordBreak = 'break-word';
+            pre.textContent = text.length > 200000 ? text.slice(0, 200000) + '\n… (truncated)' : text;
+            target.innerHTML = '';
+            target.appendChild(pre);
+        }).catch(function (e) {
+            target.innerHTML = '';
+            errorBox.textContent = e.message || String(e);
+        });
+    }
+
+    function previewImage(url, name) {
+        target.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = name;
+        img.className = 'rounded';
+        target.appendChild(img);
+    }
+
+    // Event delegation: one listener on the table body handles every
+    // current AND future row, and costs nothing at page-load time.
+    document.body.addEventListener('click', function (evt) {
+        var btn = evt.target.closest('.file-preview-btn');
+        if (!btn) return;
+        var url = btn.dataset.url;
+        var name = btn.dataset.name;
+        var kind = btn.dataset.kind;
+        var sizeBytes = parseInt(btn.dataset.size || '0', 10);
+
+        resetModal();
+        document.getElementById('filePreviewModalLabel').textContent = name;
+        modal.show();
+
+        if (kind === 'csv' && sizeBytes > LARGE_CSV_THRESHOLD) {
+            previewLargeCsv(btn.dataset.chartUrl);
+        } else if (kind === 'csv') {
+            previewCsv(url);
+        } else if (kind === 'text') {
+            previewText(url);
+        } else if (kind === 'image') {
+            previewImage(url, name);
+        } else {
+            target.innerHTML = '';
+            errorBox.textContent = 'No preview available for this file type — use download instead.';
+        }
+    });
+
+    columnCheckboxes.addEventListener('change', function (evt) {
+        if (!evt.target.classList.contains('csv-col-checkbox')) return;
+        var selected = Array.from(columnCheckboxes.querySelectorAll('.csv-col-checkbox:checked'))
+            .map(function (cb) { return cb.value; });
+        drawCsvChart(selected);
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}

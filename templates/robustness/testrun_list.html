@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Test Runs{% endblock %}
+{% block page_title %}AutoMR · Test Runs{% endblock %}
+
+{% block content %}
+<style>
+    /* ===========================
+   Loading Overlay
+=========================== */
+
+.page-loader{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.82);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999999;
+}
+
+.page-loader.d-none{
+    display:none;
+}
+
+.loader-container{
+    width:420px;
+    max-width:90%;
+    text-align:center;
+}
+
+/* Progress Bar */
+
+.loader{
+    --color-1:#fff;
+    --color-2:#25dada;
+    --size:2px;
+
+    display:block;
+    position:relative;
+
+    width:100%;
+    height:calc(12 * var(--size));
+
+    border:calc(1 * var(--size)) solid var(--color-1);
+    border-radius:calc(10 * var(--size));
+
+    overflow:hidden;
+}
+
+.loader:after{
+    content:'';
+    position:absolute;
+    left:0;
+    top:0;
+    width:0;
+    height:100%;
+    background:var(--color-2);
+    animation:loaderProgress 8.3s linear infinite;
+}
+
+@keyframes loaderProgress{
+    from{
+        width:0%;
+    }
+    to{
+        width:100%;
+    }
+}
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+            <h4 class="page-title">Test Runs</h4>
+            <a href="{% url 'robustness:testrun_create' %}" class="btn btn-primary btn-sm">
+                <i class="mdi mdi-plus"></i> New run
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if runs %}
+                <div class="table-responsive">
+                    <table class="table table-centered mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Model</th>
+                                <th>Dataset</th>
+                                <th>Status</th>
+                                <th>Runtime</th>
+                                <th>Created</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for run in runs %}
+                            <tr>
+                                <td>{{ run.pk }}</td>
+                                <td>{{ run.model.name }}</td>
+                                <td>{{ run.dataset.name }}</td>
+                                <td>
+                                    {% if run.status == 'success' %}
+                                    <span class="badge bg-soft-success text-success">Success</span>
+                                    {% elif run.status == 'failed' %}
+                                    <span class="badge bg-soft-danger text-danger">Failed</span>
+                                    {% elif run.status == 'running' %}
+                                    <span class="badge bg-soft-warning text-warning">Running</span>
+                                    {% else %}
+                                    <span class="badge bg-soft-secondary text-secondary">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if run.runtime_seconds %}{{ run.runtime_seconds|floatformat:2 }}s{% else %}—{% endif %}</td>
+                                <td>{{ run.created_at|date:"M d, Y H:i" }}</td>
+                                <td class="text-end">
+<a href="{% url 'robustness:testrun_detail' run.pk %}"
+   class="btn btn-sm btn-soft-primary view-btn">
+    View
+</a>
+                                    <form method="post" action="{% url 'robustness:testrun_delete' run.pk %}" class="d-inline" onsubmit="return confirm('Delete this run?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-soft-danger"><i class="mdi mdi-trash-can-outline"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No test runs yet — <a href="{% url 'robustness:testrun_create' %}">start one</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Loading Overlay -->
+<div id="page-loader" class="page-loader d-none">
+    <div class="loader-container">
+        <h4 class="text-white mb-3">Loading Test Run...</h4>
+
+        <span class="loader"></span>
+
+        <p class="text-white-50 mt-3 mb-0">
+            Preparing results, please wait...
+        </p>
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const loader = document.getElementById("page-loader");
+
+    document.querySelectorAll(".view-btn").forEach(function(btn){
+
+        btn.addEventListener("click", function(){
+
+            loader.classList.remove("d-none");
+
+            // Prevent double clicks
+            document.querySelectorAll(".view-btn").forEach(function(b){
+                b.style.pointerEvents = "none";
+            });
+
+        });
+
+    });
+
+});
+</script>
+{% endblock %}

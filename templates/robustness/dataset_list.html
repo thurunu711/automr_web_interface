@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Datasets{% endblock %}
+{% block page_title %}AutoMR · Datasets{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <h4 class="page-title">2 · Datasets</h4>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-3">Create a dataset</h4>
+
+                <ul class="nav nav-tabs nav-bordered mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a href="#tab-folder" data-bs-toggle="tab" aria-expanded="true" class="nav-link active">
+                            Folder path
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#tab-upload" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                            Upload images
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="tab-folder">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_kind" value="folder">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                {{ folder_form.name }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dataset folder (path on the server)</label>
+                                {{ folder_form.folder_path }}
+                                {% for error in folder_form.folder_path.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Max images to load (0 = all)</label>
+                                {{ folder_form.max_images }}
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Resize width</label>
+                                    {{ folder_form.resize_width }}
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Resize height</label>
+                                    {{ folder_form.resize_height }}
+                                </div>
+                            </div>
+                            <div class="form-check mb-3">
+                                {{ folder_form.normalize }}
+                                <label class="form-check-label">Normalize pixels to [0, 1]</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Register folder dataset</button>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab-upload">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_kind" value="upload">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                {{ upload_form.name }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Upload images</label>
+                                {{ upload_form.images }}
+                                <div class="form-text">JPG / PNG — select multiple files at once.</div>
+                                {% for error in upload_form.images.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Resize width</label>
+                                    {{ upload_form.resize_width }}
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Resize height</label>
+                                    {{ upload_form.resize_height }}
+                                </div>
+                            </div>
+                            <div class="form-check mb-3">
+                                {{ upload_form.normalize }}
+                                <label class="form-check-label">Normalize pixels to [0, 1]</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Create dataset from uploads</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-3">Datasets</h4>
+                {% if datasets %}
+                <div class="table-responsive">
+                    <table class="table table-centered mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Source</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ds in datasets %}
+                            <tr>
+                                <td><a href="{% url 'robustness:dataset_detail' ds.pk %}">{{ ds.name }}</a></td>
+                                <td><span class="badge bg-soft-info text-info">{{ ds.get_source_type_display }}</span></td>
+                                <td>{% if ds.source_type == 'upload' %}{{ ds.image_count }} image(s){% else %}scanned at run time{% endif %}</td>
+                                <td>{{ ds.uploaded_at|date:"M d, Y H:i" }}</td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'robustness:dataset_delete' ds.pk %}" class="d-inline" onsubmit="return confirm('Delete this dataset?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-soft-danger"><i class="mdi mdi-trash-can-outline"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No datasets yet — use the form to create one.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
