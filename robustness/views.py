@@ -7,6 +7,8 @@ import pickle
 import threading
 import time
 import traceback as tb_module
+import uuid
+import shutil
 
 import pandas as pd
 
@@ -16,6 +18,7 @@ from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_POST
 
 from . import automr_utils as u
 from .forms import (
@@ -33,6 +36,11 @@ from .models import (
     MLModel,
     TestRun,
 )
+
+from django.views.decorators.http import require_POST
+from robustness.external_run import register_external_run
+
+EXTERNAL_RUNS_ROOT = os.path.join(settings.BASE_DIR, "external_runs")
 
 PRED_TRACE_PAGE_SIZE = 200
 RUNS_ROOT = os.path.join(settings.MEDIA_ROOT, "automr_runs")
@@ -54,7 +62,7 @@ def model_list(request):
 
     return render(request, "robustness/model_list.html", {
         "form": form,
-        "models": MLModel.objects.all(),
+        "models": MLModel.objects.exclude(name__startswith="[external]"),
     })
 
 
@@ -103,10 +111,10 @@ def dataset_list(request):
                 return redirect("robustness:dataset_list")
 
     return render(request, "robustness/dataset_list.html", {
-        "folder_form": folder_form,
-        "upload_form": upload_form,
-        "datasets": Dataset.objects.all(),
-    })
+    "folder_form": folder_form,
+    "upload_form": upload_form,
+    "datasets": Dataset.objects.exclude(name__startswith="[external]"),
+})
 
 
 def dataset_detail(request, pk):
@@ -454,9 +462,14 @@ def testrun_detail(request, pk):
 def testrun_delete(request, pk):
     run = get_object_or_404(TestRun, pk=pk)
     if request.method == "POST":
-        import shutil
+        # Only delete the on-disk folder if the app created it (a normal
+        # run's own output under RUNS_ROOT). Never delete an external run's
+        # folder — that's the user's own data at a path they pointed us to.
         if run.output_dir and os.path.isdir(run.output_dir):
-            shutil.rmtree(run.output_dir, ignore_errors=True)
+            run_dir_norm = os.path.normpath(run.output_dir)
+            runs_root_norm = os.path.normpath(RUNS_ROOT)
+            if run_dir_norm == runs_root_norm or run_dir_norm.startswith(runs_root_norm + os.sep):
+                shutil.rmtree(run.output_dir, ignore_errors=True)
         run.delete()
         messages.success(request, "Test run deleted.")
     return redirect("robustness:testrun_list")
@@ -620,3 +633,24 @@ def live_feed_snapshot(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e), "traceback": tb_module.format_exc()}, status=500)
+
+@require_POST
+def testrun_import_external(request):
+    path = request.POST.get("folder_path", "").strip().strip('"')
+    label = request.POST.get("label") or "external-run"
+
+    if not path:
+        messages.error(request, "Please enter a folder path.")
+        return redirect("robustness:testrun_list")
+
+    if not os.path.isdir(path):
+        messages.error(request, f"Not a folder Django can see: {path}")
+        return redirect("robustness:testrun_list")
+
+    try:
+        run = register_external_run(path, label=label, copy_to_media=False)
+        messages.success(request, f"Imported external run #{run.pk} ({label}).")
+        return redirect("robustness:testrun_detail", pk=run.pk)
+    except Exception as e:
+        messages.error(request, f"Import failed: {e}")
+        return redirect("robustness:testrun_list")
