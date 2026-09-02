@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-0bnikeax@p9i^0r9uf@u8xc9vbbqgv^m9%@pzw!rjq8a03(kz-
 DEBUG = True
 
 ALLOWED_HOSTS = ['automr-web-interface.onrender.com']
+# ALLOWED_HOSTS = []
 
 
 # Application definition

@@ -14,6 +14,7 @@ urlpatterns = [
 
     path("runs/", views.testrun_list, name="testrun_list"),
     path("runs/new/", views.testrun_create, name="testrun_create"),
+    path("runs/import/", views.testrun_import_external, name="testrun_import_external"),
     path("runs/<int:pk>/", views.testrun_detail, name="testrun_detail"),
     path("runs/<int:pk>/delete/", views.testrun_delete, name="testrun_delete"),
     re_path(r"^runs/(?P<pk>\d+)/files/(?P<relpath>.+)$", views.testrun_download_file, name="testrun_download_file"),
