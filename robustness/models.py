@@ -14,6 +14,7 @@ FRAMEWORK_CHOICES = [
     ("pytorch", "PyTorch (.pt / .pth — full saved model)"),
     ("sklearn", "scikit-learn (.pkl / .joblib)"),
     ("onnx", "ONNX (.onnx)"),
+    ("custom", "Custom TF1 checkpoint (model.py + .ckpt + .ckpt.meta)"),
 ]
 
 FRAMEWORK_LABELS = dict(FRAMEWORK_CHOICES)
@@ -43,6 +44,20 @@ class MLModel(models.Model):
     framework = models.CharField(max_length=20, choices=FRAMEWORK_CHOICES)
     model_file = models.FileField(upload_to="models/%Y/%m/%d/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    # --- only used when framework == "custom": a raw TF1 checkpoint like
+    # the SullyChen/NVIDIA steering-angle model (model.ckpt + model.ckpt.meta),
+    # which needs the original model.py graph definition to be rebuilt
+    # before the checkpoint can be restored into it. `model_file` holds the
+    # .ckpt data file itself for this framework. ---
+    model_def_file = models.FileField(
+        upload_to="models/def/%Y/%m/%d/", blank=True, null=True,
+        help_text="Only for 'custom' framework: the .py file defining the TF1 graph (e.g. model.py). Must define module-level `x` (input placeholder) and `y` (output tensor).",
+    )
+    checkpoint_meta_file = models.FileField(
+        upload_to="models/meta/%Y/%m/%d/", blank=True, null=True,
+        help_text="Only for 'custom' framework: the checkpoint's .ckpt.meta file.",
+    )
 
     class Meta:
         ordering = ["-uploaded_at"]

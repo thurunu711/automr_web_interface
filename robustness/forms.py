@@ -2,7 +2,9 @@ from django import forms
 
 from .models import ALL_MRS, CameraSettings, Dataset, MLModel, TASK_CHOICES, TestRun
 
-MODEL_FILE_EXTS = [".h5", ".keras", ".pt", ".pth", ".pkl", ".joblib", ".onnx"]
+MODEL_FILE_EXTS = [".h5", ".keras", ".pt", ".pth", ".pkl", ".joblib", ".onnx", ".ckpt"]
+MODEL_DEF_EXTS = [".py"]
+CHECKPOINT_META_EXTS = [".meta"]
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -28,23 +30,50 @@ class MultipleFileField(forms.FileField):
 class MLModelUploadForm(forms.ModelForm):
     class Meta:
         model = MLModel
-        fields = ["name", "framework", "model_file"]
+        fields = ["name", "framework", "model_file", "model_def_file", "checkpoint_meta_file"]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g. traffic-sign-cnn-v2"}),
             "framework": forms.Select(attrs={"class": "form-select"}),
             "model_file": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "model_def_file": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "checkpoint_meta_file": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["model_def_file"].required = False
+        self.fields["checkpoint_meta_file"].required = False
 
     def clean(self):
         cleaned = super().clean()
+        import os
+
+        framework = cleaned.get("framework")
         f = cleaned.get("model_file")
         if f is not None:
-            import os
             ext = os.path.splitext(f.name)[1].lower()
             if ext not in MODEL_FILE_EXTS:
                 raise forms.ValidationError(
                     f"Unrecognized file extension '{ext}'. Expected one of: {', '.join(MODEL_FILE_EXTS)}"
                 )
+
+        if framework == "custom":
+            def_file = cleaned.get("model_def_file")
+            meta_file = cleaned.get("checkpoint_meta_file")
+
+            if not def_file:
+                self.add_error("model_def_file", "Required for the 'custom' framework — upload the .py graph definition (e.g. model.py).")
+            elif os.path.splitext(def_file.name)[1].lower() not in MODEL_DEF_EXTS:
+                self.add_error("model_def_file", f"Expected a {', '.join(MODEL_DEF_EXTS)} file.")
+
+            if not meta_file:
+                self.add_error("checkpoint_meta_file", "Required for the 'custom' framework — upload the checkpoint's .ckpt.meta file.")
+            elif os.path.splitext(meta_file.name)[1].lower() not in CHECKPOINT_META_EXTS:
+                self.add_error("checkpoint_meta_file", f"Expected a {', '.join(CHECKPOINT_META_EXTS)} file.")
+
+            if f is not None and os.path.splitext(f.name)[1].lower() != ".ckpt":
+                self.add_error("model_file", "For the 'custom' framework, this should be the .ckpt data file.")
+
         return cleaned
 
 
