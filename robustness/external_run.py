@@ -116,7 +116,7 @@ def _resolve_model(model_id, src, label):
         framework = "sklearn"
 
     model, _created = MLModel.objects.get_or_create(
-        name=f"[external] {label}", framework=framework,
+        name=f" {label}", framework=framework,
     )
     return model
 
@@ -126,7 +126,7 @@ def _resolve_dataset(dataset_id, src, label):
         return Dataset.objects.get(pk=dataset_id)
 
     dataset, _created = Dataset.objects.get_or_create(
-        name=f"[external] {label}",
+        name=f" {label}",
         source_type="folder",
         defaults={"folder_path": src},
     )
