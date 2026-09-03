@@ -128,8 +128,8 @@ class TestRunForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["model"].queryset = MLModel.objects.all()
-        self.fields["dataset"].queryset = Dataset.objects.all()
+        self.fields["model"].queryset = MLModel.objects.exclude(model_file="")
+        self.fields["dataset"].queryset = Dataset.objects.filter(source_type="upload")        
         self.fields["output_dir"].required = False
         # NOTE: no `.initial = "results"` here anymore. That line used to
         # pre-fill every new run's output_dir with the literal string
@@ -161,7 +161,7 @@ class LiveFeedForm(forms.Form):
     plus the Live Feed tab's own epsilon slider/update interval."""
 
     model = forms.ModelChoiceField(
-        queryset=MLModel.objects.all(),
+        queryset=MLModel.objects.exclude(model_file=""),
         widget=forms.Select(attrs={"class": "form-select"}),
     )
     task = forms.ChoiceField(choices=TASK_CHOICES, initial="regression",

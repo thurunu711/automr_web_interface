@@ -62,8 +62,7 @@ def model_list(request):
 
     return render(request, "robustness/model_list.html", {
         "form": form,
-        "models": MLModel.objects.exclude(name__startswith="[external]"),
-    })
+        "models": MLModel.objects.exclude(model_file=""),    })
 
 
 def model_delete(request, pk):
@@ -113,8 +112,7 @@ def dataset_list(request):
     return render(request, "robustness/dataset_list.html", {
     "folder_form": folder_form,
     "upload_form": upload_form,
-    "datasets": Dataset.objects.exclude(name__startswith="[external]"),
-})
+    "datasets": Dataset.objects.filter(source_type="upload"),})
 
 
 def dataset_detail(request, pk):

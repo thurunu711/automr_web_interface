@@ -25,9 +25,11 @@ SECRET_KEY = 'django-insecure-0bnikeax@p9i^0r9uf@u8xc9vbbqgv^m9%@pzw!rjq8a03(kz-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['automr-web-interface.onrender.com']
-# ALLOWED_HOSTS = []
-
+# ALLOWED_HOSTS = ['automr-web-interface.onrender.com']
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://sprig-atypical-generous.ngrok-free.dev',
+]
 
 # Application definition
 
