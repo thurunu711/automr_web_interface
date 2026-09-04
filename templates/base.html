@@ -105,26 +105,27 @@
                     </li>
 
                     <li class="menu-item">
+                        <a href="{% url 'robustness:live_feed' %}" class="menu-link {% if request.resolver_match.url_name == 'live_feed' %}active{% endif %}">
+                            <span class="menu-icon"><i data-feather="video"></i></span>
+                            <span class="menu-text"> Live Feed </span>
+                        </a>
+                    </li>
+
+                    <li class="menu-item">
                         <a href="{% url 'robustness:testrun_list' %}" class="menu-link {% if 'testrun' in request.resolver_match.url_name %}active{% endif %}">
                             <span class="menu-icon"><i data-feather="activity"></i></span>
                             <span class="menu-text"> Test Runs </span>
                         </a>
                     </li>
 
-                    <li class="menu-item">
-                        <a href="{% url 'robustness:live_feed' %}" class="menu-link {% if request.resolver_match.url_name == 'live_feed' %}active{% endif %}">
-                            <span class="menu-icon"><i data-feather="video"></i></span>
-                            <span class="menu-text"> Live Feed </span>
-                        </a>
-                    </li>
                     <li class="menu-title">Configuration</li>
 
-                    <li class="menu-item">
+                    <!-- <li class="menu-item">
                         <a href="{% url 'dashboard:reports' %}" class="menu-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
                             <span class="menu-icon"><i data-feather="bar-chart-2"></i></span>
                             <span class="menu-text"> Reports </span>
                         </a>
-                    </li>
+                    </li> -->
 
                     <li class="menu-item">
                         <a href="{% url 'dashboard:settings' %}" class="menu-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
@@ -182,7 +183,7 @@
                         </li>
 
                         <!-- Notifications -->
-                        <li class="dropdown notification-list">
+                        <!-- <li class="dropdown notification-list">
                             <a class="nav-link dropdown-toggle waves-effect waves-light arrow-none" data-bs-toggle="dropdown" href="#" role="button">
                                 <i class="fe-bell font-22"></i>
                                 <span class="badge bg-danger rounded-circle noti-icon-badge">3</span>
@@ -207,17 +208,17 @@
                                     </a>
                                 </div>
                             </div>
-                        </li>
+                        </li> -->
 
                         <!-- Light/Dark Mode Toggle -->
-                        <li class="d-none d-sm-inline-block">
+                        <!-- <li class="d-none d-sm-inline-block">
                             <div class="nav-link waves-effect waves-light" id="light-dark-mode">
                                 <i class="ri-moon-line font-22"></i>
                             </div>
-                        </li>
+                        </li> -->
 
                         <!-- User -->
-                        <li class="dropdown">
+                        <!-- <li class="dropdown">
                             <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button">
                                 <img src="{% static 'vendor/ubold/assets/images/users/user-1.jpg' %}" alt="user-image" class="rounded-circle">
                                 <span class="ms-1 d-none d-md-inline-block">
@@ -239,7 +240,7 @@
                                     <i class="fe-log-out"></i><span>Logout</span>
                                 </a>
                             </div>
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
             </div>
