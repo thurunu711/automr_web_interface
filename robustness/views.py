@@ -198,7 +198,12 @@ def _execute_run(run: TestRun):
         if not dataset_images:
             raise ValueError(f"No images could be loaded for dataset '{run.dataset.name}'.")
 
-        model_obj = u.load_model_from_path(run.model.model_file.path, run.model.framework)
+        model_obj = u.load_model_from_path(
+            run.model.model_file.path,
+            run.model.framework,
+            def_file_path=run.model.model_def_file.path if run.model.model_def_file else None,
+            meta_file_path=run.model.checkpoint_meta_file.path if run.model.checkpoint_meta_file else None,
+        )
 
         with contextlib.redirect_stdout(log_buffer), contextlib.redirect_stderr(log_buffer):
             automr = AutoMR(
@@ -536,7 +541,12 @@ def _get_cached_live_automr(model: MLModel, task, range_threshold, epsilon, sele
         if cached and cached["key"] == cache_key:
             return cached["model_obj"], cached["automr"]
 
-        model_obj = u.load_model_from_path(model.model_file.path, model.framework)
+        model_obj = u.load_model_from_path(
+            model.model_file.path,
+            model.framework,
+            def_file_path=model.model_def_file.path if model.model_def_file else None,
+            meta_file_path=model.checkpoint_meta_file.path if model.checkpoint_meta_file else None,
+        )
         automr = AutoMR(model=model_obj, task=task, input_type="image",
                          epsilon=float(epsilon), range_threshold=float(range_threshold))
         for name in list(automr.list_transforms()):

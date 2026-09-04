@@ -39,13 +39,42 @@
                     <div class="mb-3">
                         <label class="form-label">Model file</label>
                         {{ form.model_file }}
-                        <div class="form-text">.h5 / .keras / .pt / .pth / .pkl / .joblib / .onnx</div>
+                        <div class="form-text">.h5 / .keras / .pt / .pth / .pkl / .joblib / .onnx — or the .ckpt data file for "Custom"</div>
+                        {% if form.model_file.errors %}<div class="text-danger small">{{ form.model_file.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3" id="custom-def-field">
+                        <label class="form-label">Model definition (.py)</label>
+                        {{ form.model_def_file }}
+                        <div class="form-text">Only for "Custom TF1 checkpoint" — the model.py that defines the graph (must set module-level tensors <code>x</code> and <code>y</code>).</div>
+                        {% if form.model_def_file.errors %}<div class="text-danger small">{{ form.model_def_file.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3" id="custom-meta-field">
+                        <label class="form-label">Checkpoint .meta file</label>
+                        {{ form.checkpoint_meta_file }}
+                        <div class="form-text">Only for "Custom TF1 checkpoint" — the matching .ckpt.meta file.</div>
+                        {% if form.checkpoint_meta_file.errors %}<div class="text-danger small">{{ form.checkpoint_meta_file.errors }}</div>{% endif %}
                     </div>
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>
                     {% endif %}
                     <button type="submit" class="btn btn-primary w-100">Load model</button>
                 </form>
+                <script>
+                (function () {
+                    var frameworkField = document.getElementById("{{ form.framework.id_for_label }}");
+                    var defField = document.getElementById("custom-def-field");
+                    var metaField = document.getElementById("custom-meta-field");
+                    function toggle() {
+                        var isCustom = frameworkField.value === "custom";
+                        defField.style.display = isCustom ? "" : "none";
+                        metaField.style.display = isCustom ? "" : "none";
+                    }
+                    if (frameworkField) {
+                        frameworkField.addEventListener("change", toggle);
+                        toggle();
+                    }
+                })();
+                </script>
             </div>
         </div>
     </div>

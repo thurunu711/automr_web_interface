@@ -32,9 +32,12 @@ def fetch_ip_webcam_snapshot(base_url: str, timeout: float = 4.0) -> Image.Image
 # Model loading
 # ============================================================
 
-def load_model_from_path(file_path, framework):
+def load_model_from_path(file_path, framework, def_file_path=None, meta_file_path=None):
     """Load a model already saved on disk (Django's FileField gives us a
-    real path via .path, unlike Streamlit's in-memory UploadedFile)."""
+    real path via .path, unlike Streamlit's in-memory UploadedFile).
+
+    `def_file_path` / `meta_file_path` are only used for framework=="custom"
+    (a raw TF1 checkpoint) — see `_load_custom_ckpt_model` below."""
     suffix = os.path.splitext(file_path)[1].lower()
 
     if framework == "tensorflow":
@@ -59,7 +62,87 @@ def load_model_from_path(file_path, framework):
     if framework == "onnx":
         return file_path  # onnxruntime takes a path directly
 
+    if framework == "custom":
+        return _load_custom_ckpt_model(file_path, def_file_path, meta_file_path)
+
     raise ValueError(f"Unsupported framework: {framework}")
+
+
+class CustomCheckpointModel:
+    """Wraps a raw TF1 checkpoint (SullyChen/NVIDIA steering-angle style:
+    model.py defines module-level tensors `x` [input placeholder], `y`
+    [output], and optionally `keep_prob`) behind a `.predict()` method so
+    AutoMR's generic custom-model path (`hasattr(model, "predict")`) picks
+    it up automatically — no changes needed to automr itself."""
+
+    def __init__(self, session, module):
+        self._sess = session
+        self._module = module
+        # e.g. (66, 200, 3) from the placeholder shape [None, 66, 200, 3]
+        self._input_shape = tuple(int(d) for d in module.x.shape[1:])
+
+    def _prep(self, x):
+        arr = np.asarray(x, dtype=np.float32)
+        if arr.ndim == len(self._input_shape):
+            arr = arr[np.newaxis, ...]  # add batch dim for a single image
+
+        target_h, target_w = self._input_shape[0], self._input_shape[1]
+        if arr.shape[1:3] != (target_h, target_w):
+            arr = np.stack([
+                np.array(
+                    Image.fromarray(np.uint8(np.clip(img, 0, 255))).resize((target_w, target_h)),
+                    dtype=np.float32,
+                )
+                for img in arr
+            ])
+
+        if arr.max() > 1.0:  # already-normalized datasets are left as-is
+            arr = arr / 255.0
+
+        return arr
+
+    def predict(self, x):
+        batch = self._prep(x)
+        feed = {self._module.x: batch}
+        if hasattr(self._module, "keep_prob"):
+            feed[self._module.keep_prob] = 1.0
+        out = self._sess.run(self._module.y, feed_dict=feed)
+        return np.asarray(out).reshape(len(batch), -1).squeeze(-1)
+
+
+def _load_custom_ckpt_model(ckpt_path, def_file_path, meta_file_path):
+    """Rebuilds the TF1 graph from an uploaded model.py, then restores the
+    checkpoint into it. `meta_file_path` isn't actually read here (the
+    Saver rebuilds the graph from model.py, not from the .meta file) — it's
+    still required on upload so the checkpoint is validated as complete."""
+    import importlib.util
+    import tensorflow.compat.v1 as tf1
+    tf1.disable_v2_behavior()
+
+    if not def_file_path or not os.path.exists(def_file_path):
+        raise ValueError("The 'custom' framework requires a model definition (.py) file — none was uploaded.")
+    if not meta_file_path or not os.path.exists(meta_file_path):
+        raise ValueError("The 'custom' framework requires the checkpoint's .ckpt.meta file — none was uploaded.")
+    if not os.path.exists(ckpt_path):
+        raise ValueError(f"Checkpoint file not found: {ckpt_path}")
+
+    graph = tf1.Graph()
+    with graph.as_default():
+        spec = importlib.util.spec_from_file_location("_uploaded_model_def", def_file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        if not hasattr(module, "x") or not hasattr(module, "y"):
+            raise ValueError(
+                "Model definition file must define module-level tensors `x` (input placeholder) "
+                "and `y` (output tensor) — as in the steering-angle model.py."
+            )
+
+        sess = tf1.Session(graph=graph)
+        saver = tf1.train.Saver()
+        saver.restore(sess, ckpt_path)
+
+    return CustomCheckpointModel(sess, module)
 
 
 FRAMEWORK_LABELS = {
@@ -67,6 +150,7 @@ FRAMEWORK_LABELS = {
     "pytorch": "PyTorch",
     "sklearn": "scikit-learn",
     "onnx": "ONNX",
+    "custom": "Custom TF1 checkpoint",
 }
 
 
@@ -98,6 +182,9 @@ def predict_single(model, framework, arr):
             x = np.expand_dims(arr.astype(np.float32), axis=0)
             pred = sess.run(None, {input_name: x})
             return float(np.array(pred[0]).flatten()[0])
+        if kind == "Custom TF1 checkpoint":
+            pred = model.predict(arr)
+            return float(np.array(pred).flatten()[0])
     except Exception as e:
         return f"(prediction failed: {e})"
     return None
